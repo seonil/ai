@@ -34,7 +34,7 @@
       <div class="bg-white p-8 rounded-2xl shadow-lg">
         <h1 class="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-4">Scent Finder</h1>
         <p class="text-lg text-gray-600 mb-6">당신의 기억과 감성 속에 숨겨진<br>인생 향수를 찾아드릴게요.</p>
-        <p class="text-gray-500 mb-8">Gemini AI가 15가지 질문으로 당신의 취향을 분석합니다.</p>
+        <p class="text-gray-500 mb-8">AI가 15가지 질문으로 당신의 취향을 분석합니다.</p>
         <button id="start-btn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-full hover:bg-indigo-700 transition-colors shadow-md text-lg">내 향수 찾기 시작</button>
       </div>
     </section>
@@ -239,7 +239,7 @@
       loadingScreen.classList.remove('hidden');
       loader.classList.remove('hidden');
       retryContainer.classList.add('hidden');
-      loadingTitle.textContent = 'Gemini AI가 분석 중입니다.';
+      loadingTitle.textContent = 'AI가 분석중입니다.';
       loadingMessage.innerHTML = '당신의 감성과 기억 속에서<br>가장 빛나는 향기를 찾는 중...';
       try {
         const result = await callGeminiAPI(userAnswers);
