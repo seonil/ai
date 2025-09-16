@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scent Finder: AI가 찾아주는 당신의 인생 향수</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- PWA basics -->
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#4f46e5">
+  <link rel="icon" href="/icon-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+
+  <style>
+    body { font-family: 'Noto Sans KR', sans-serif; }
+    .font-serif { font-family: 'Playfair Display', serif; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+    .option-card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out; }
+    .option-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+    .option-card.selected { border-color: #4f46e5; background-color: #eef2ff; transform: translateY(-2px); }
+    .loader { border: 4px solid #f3f3f3; border-top: 4px solid #4f46e5; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <div id="app" class="max-w-2xl mx-auto p-4 md:p-8">
+    <!-- Start Screen -->
+    <section id="start-screen" class="text-center fade-in">
+      <div class="bg-white p-8 rounded-2xl shadow-lg">
+        <h1 class="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-4">Scent Finder</h1>
+        <p class="text-lg text-gray-600 mb-6">당신의 기억과 감성 속에 숨겨진<br>인생 향수를 찾아드릴게요.</p>
+        <p class="text-gray-500 mb-8">Gemini AI가 15가지 질문으로 당신의 취향을 분석합니다.</p>
+        <button id="start-btn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-full hover:bg-indigo-700 transition-colors shadow-md text-lg">내 향수 찾기 시작</button>
+      </div>
+    </section>
+
+    <!-- Quiz Screen -->
+    <section id="quiz-screen" class="hidden">
+      <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+        <div class="mb-6">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-indigo-600">Question <span id="question-number"></span>/15</span>
+            <span id="question-type" class="text-xs text-gray-500"></span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300"></div>
+          </div>
+        </div>
+        <h2 id="question-title" class="text-2xl font-bold mb-6 text-gray-900 leading-snug"></h2>
+        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        <div id="next-button-container" class="mt-8 text-center">
+          <button id="next-button" class="bg-indigo-600 text-white font-bold py-3 px-12 rounded-full hover:bg-indigo-700 transition-colors shadow-md disabled:bg-gray-300">다음</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading Screen -->
+    <section id="loading-screen" class="hidden text-center fade-in">
+      <div class="bg-white p-8 rounded-2xl shadow-lg flex flex-col items-center justify-center min-h-[400px]">
+        <div id="loader" class="loader mb-6"></div>
+        <h2 id="loading-title" class="text-2xl font-bold text-gray-900 mb-2">Gemini AI가 분석 중입니다.</h2>
+        <p id="loading-message" class="text-gray-600">당신의 감성과 기억 속에서<br>가장 빛나는 향기를 찾는 중...</p>
+        <div id="retry-container" class="hidden mt-6">
+          <button id="retry-btn" class="bg-red-600 text-white font-bold py-3 px-8 rounded-full hover:bg-red-700 transition-colors">다시 요청</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Screen -->
+    <section id="results-screen" class="hidden fade-in">
+      <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+        <div class="text-center mb-6">
+          <p class="text-sm text-indigo-600 font-semibold">당신의 향기 페르소나</p>
+          <h3 id="persona-title" class="text-2xl md:text-3xl font-bold text-gray-900"></h3>
+          <p id="persona-description" class="text-gray-600 mt-2"></p>
+        </div>
+        <div id="recommendations-container" class="space-y-4"></div>
+        <div class="mt-8 text-center">
+          <button id="restart-btn" class="bg-gray-800 text-white font-bold py-3 px-8 rounded-full hover:bg-gray-900 transition-colors">다시 찾기</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ----- Elements
+    const startBtn = document.getElementById('start-btn');
+    const retryBtn = document.getElementById('retry-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const loadingScreen = document.getElementById('loading-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const questionNumberEl = document.getElementById('question-number');
+    const questionTypeEl = document.getElementById('question-type');
+    const progressBarEl = document.getElementById('progress-bar');
+    const questionTitleEl = document.getElementById('question-title');
+    const optionsContainer = document.getElementById('options-container');
+    const nextButton = document.getElementById('next-button');
+    const loader = document.getElementById('loader');
+    const retryContainer = document.getElementById('retry-container');
+    const loadingTitle = document.getElementById('loading-title');
+    const loadingMessage = document.getElementById('loading-message');
+
+    startBtn.addEventListener('click', startQuiz);
+    nextButton.addEventListener('click', nextQuestion);
+    retryBtn.addEventListener('click', showLoadingAndAnalyze);
+    restartBtn.addEventListener('click', restartQuiz);
+
+    // ----- Quiz Data
+    const quizData = [
+      { question: "당신의 오늘 기분을 색으로 표현한다면?", type: 'single', options: ["맑은 하늘 같은 파랑", "따뜻한 햇살 같은 노랑", "잔잔한 초록", "차분한 회색"] },
+      { question: "향수로 표현하고 싶은 분위기는?", type: 'multiple', options: ["깨끗하고 신선한", "따뜻하고 포근한", "세련되고 도시적인", "자연적이고 편안한", "관능적이고 대담한"] },
+      { question: "아침에 일어났을 때 가장 먼저 떠오르는 향은?", type: 'single', options: ["막 갓 내린 커피 향", "빨래한 셔츠의 비누 향", "창문 열 때 들어오는 바람 냄새", "따뜻한 나무 가구의 향"] },
+      { question: "좋아하는 계절과 그 계절에서 떠오르는 향은?", type: 'multiple', options: ["봄 – 꽃향기, 새싹의 풋내", "여름 – 바닷바람, 시트러스", "가을 – 낙엽, 스파이스", "겨울 – 머스크, 앰버"] },
+      { question: "기억 속 깊이 남아 있는 향은?", type: 'single', options: ["누군가의 따뜻한 체취", "비 온 뒤 흙냄새", "서점의 종이 냄새", "병원/약국의 약 냄새"] },
+      { question: "당신의 이상적인 데이트 장소는?", type: 'multiple', options: ["한적한 공원", "도심 속 미술관", "분위기 좋은 카페", "바다가 보이는 곳"] },
+      { question: "하루 중 향수의 존재감을 느끼고 싶은 순간은?", type: 'single', options: ["처음 인사할 때", "가까이 다가섰을 때", "지나간 뒤에 남을 때"] },
+      { question: "일상에서 더 끌리는 향의 무드는?", type: 'multiple', options: ["깨끗한 비누/샤워 후 느낌", "부드러운 파우더리", "상큼한 과일/시트러스", "차분한 우디/머스크", "꽃 향기"] },
+      { question: "가장 기억에 남는 여행지의 향기는?", type: 'single', options: ["바닷바람과 소금기", "숲의 흙냄새와 나무향", "도시의 차가운 공기", "시장/베이커리의 달큰한 향"] },
+      { question: "당신의 성향을 한 단어로 표현한다면?", type: 'single', options: ["섬세함", "자유로움", "따뜻함", "카리스마"] },
+      { question: "일할 때 집중을 돕는 향은?", type: 'multiple', options: ["상쾌한 민트/허브", "가벼운 시트러스", "차분한 라벤더", "깊은 나무향"] },
+      { question: "주말에 가장 하고 싶은 활동은?", type: 'single', options: ["카페에서 책 읽기", "자연 속 산책", "집에서 휴식", "전시/공연 감상"] },
+      { question: "평소 즐겨 입는 패션 스타일은?", type: 'multiple', options: ["기본템 위주의 미니멀리즘", "편안하고 활동적인 캐주얼", "여성스러운 라인의 페미닌", "개성 있는 디자인의 유니크/빈티지"] },
+      { question: "혹시 기피하는 향이 있다면?", type: 'single', options: ["속이 울렁이는 지나치게 단 향", "머리 아픈 너무 인공적인 향", "너무 강하고 톡 쏘는 향", "특별히 없음"] },
+      { question: "향수의 지속력은 어느 정도가 중요한가요?", type: 'single', options: ["매우 중요해요 (6시간 이상)", "어느 정도 중요해요 (3-5시간)", "크게 상관없어요"] },
+      { question: "향수를 선택할 때 더 중요한 것은?", type: 'single', options: ["많은 사람이 좋아하는 '베스트셀러'", "나만 알고 싶은 '니치 향수'"] },
+      { question: "마지막으로, 당신이 찾고 있는 향기에 대한 느낌이나 단어가 있다면 자유롭게 알려주세요. (선택사항)", type: 'text', placeholder: "예: 비 온 뒤의 흙냄새, 따뜻한 살냄새, 이제 막 세탁한 셔츠의 향기..." }
+    ];
+
+    // ----- State
+    let currentQuestionIndex = 0;
+    let userAnswers = [];
+    let selectedOptions = new Set();
+    let isProcessing = false;
+
+    function startQuiz() {
+      startScreen.classList.add('hidden');
+      quizScreen.classList.remove('hidden');
+      currentQuestionIndex = 0;
+      userAnswers = [];
+      isProcessing = false;
+      displayQuestion();
+    }
+
+    function displayQuestion() {
+      selectedOptions.clear();
+      const question = quizData[currentQuestionIndex];
+      const isLast = currentQuestionIndex === quizData.length - 1;
+      questionNumberEl.textContent = currentQuestionIndex + 1;
+      progressBarEl.style.width = `${((currentQuestionIndex + 1) / quizData.length) * 100}%`;
+      questionTitleEl.textContent = question.question;
+      optionsContainer.innerHTML = '';
+      nextButton.textContent = isLast ? '결과 보기' : '다음';
+
+      if (question.type === 'text') {
+        questionTypeEl.textContent = '주관식 답변 (선택)';
+        document.getElementById('next-button-container').classList.remove('hidden');
+        const textArea = document.createElement('textarea');
+        textArea.id = 'text-answer';
+        textArea.className = 'w-full h-32 p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition';
+        textArea.placeholder = question.placeholder;
+        optionsContainer.appendChild(textArea);
+        optionsContainer.classList.remove('md:grid-cols-2');
+        nextButton.disabled = false;
+      } else {
+        questionTypeEl.textContent = question.type === 'multiple' ? '중복 선택 가능' : '하나만 선택';
+        document.getElementById('next-button-container').classList.toggle('hidden', question.type === 'single');
+        optionsContainer.classList.add('md:grid-cols-2');
+        question.options.forEach((optionText, index) => {
+          const card = document.createElement('div');
+          card.className = 'option-card border-2 border-gray-200 p-4 rounded-xl cursor-pointer text-center';
+          card.textContent = optionText;
+          card.dataset.optionIndex = index;
+          card.onclick = () => toggleOption(card, question.type);
+          optionsContainer.appendChild(card);
+        });
+        updateNextButtonState();
+      }
+    }
+
+    function toggleOption(card, type) {
+      if (isProcessing) return;
+      const optionIndex = card.dataset.optionIndex;
+      if (type === 'single') {
+        isProcessing = true;
+        if (selectedOptions.has(optionIndex)) return;
+        const currentSelected = optionsContainer.querySelector('.selected');
+        if (currentSelected) currentSelected.classList.remove('selected');
+        card.classList.add('selected');
+        selectedOptions.clear();
+        selectedOptions.add(optionIndex);
+        setTimeout(() => { nextQuestion(); isProcessing = false; }, 300);
+      } else {
+        if (selectedOptions.has(optionIndex)) {
+          selectedOptions.delete(optionIndex);
+          card.classList.remove('selected');
+        } else {
+          selectedOptions.add(optionIndex);
+          card.classList.add('selected');
+        }
+      }
+      updateNextButtonState();
+    }
+
+    function updateNextButtonState() {
+      const q = quizData[currentQuestionIndex];
+      if (q.type === 'multiple') {
+        nextButton.disabled = selectedOptions.size === 0;
+      }
+    }
+
+    function nextQuestion() {
+      const question = quizData[currentQuestionIndex];
+      if (question.type === 'text') {
+        const textAnswer = (document.getElementById('text-answer').value || '').trim();
+        userAnswers.push({ question: question.question, answers: [textAnswer] });
+      } else {
+        const selectedTexts = Array.from(selectedOptions).map(index => question.options[parseInt(index)]);
+        if (selectedTexts.length > 0) {
+          userAnswers.push({ question: question.question, answers: selectedTexts });
+        }
+      }
+      currentQuestionIndex++;
+      if (currentQuestionIndex < quizData.length) {
+        displayQuestion();
+      } else {
+        showLoadingAndAnalyze();
+      }
+    }
+
+    async function showLoadingAndAnalyze() {
+      quizScreen.classList.add('hidden');
+      loadingScreen.classList.remove('hidden');
+      loader.classList.remove('hidden');
+      retryContainer.classList.add('hidden');
+      loadingTitle.textContent = 'Gemini AI가 분석 중입니다.';
+      loadingMessage.innerHTML = '당신의 감성과 기억 속에서<br>가장 빛나는 향기를 찾는 중...';
+      try {
+        const result = await callGeminiAPI(userAnswers);
+        displayResults(result);
+      } catch (error) {
+        console.error('AI analysis error:', error);
+        loader.classList.add('hidden');
+        loadingTitle.textContent = '오류 발생';
+        loadingMessage.innerHTML = '죄송합니다, 분석 중 오류가 발생했습니다.<br>잠시 후 다시 시도해주세요.';
+        retryContainer.classList.remove('hidden');
+      }
+    }
+
+    async function callGeminiAPI(answers) {
+      const response = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers })
+      });
+      if (!response.ok) {
+        const text = await response.text().catch(() => '');
+        throw new Error(`API request failed: ${response.status} ${text}`);
+      }
+      return response.json();
+    }
+
+    function displayResults(result) {
+      loadingScreen.classList.add('hidden');
+      resultsScreen.classList.remove('hidden');
+      document.getElementById('persona-title').textContent = result.persona.title;
+      document.getElementById('persona-description').textContent = result.persona.description;
+      const recommendationsContainer = document.getElementById('recommendations-container');
+      recommendationsContainer.innerHTML = '';
+      (result.recommendations || []).forEach((perfume, index) => {
+        const encodedName = encodeURIComponent((perfume.name || '').replace(/ /g, '+'));
+        const card = `
+          <div class="bg-gray-50 p-4 rounded-xl text-left fade-in" style="animation-delay: ${index * 0.2}s;">
+            <div class="flex items-start sm:items-center space-x-4">
+              <img src="https://placehold.co/100x100/F3F4F6/333333?text=${encodedName}" alt="${perfume.name}" class="w-20 h-20 md:w-24 md:h-24 rounded-lg object-cover flex-shrink-0">
+              <div class="flex-grow">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="text-sm text-indigo-600 font-semibold">${perfume.brand || ''}</p>
+                    <h4 class="text-lg md:text-xl font-bold text-gray-900">${perfume.name || ''}</h4>
+                  </div>
+                  <span class="text-xs font-bold bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full whitespace-nowrap ml-2">추천 ${index + 1}</span>
+                </div>
+                <p class="text-sm text-gray-600 mt-1 mb-2">${perfume.description || ''}</p>
+                <div class="flex flex-wrap gap-2">
+                  ${(perfume.keywords || []).map(kw => `<span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-md">${kw}</span>`).join('')}
+                </div>
+              </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
+              <div>
+                <p class="text-xs text-gray-500">예상 가격</p>
+                <p class="font-bold text-gray-800">${perfume.price || '가격 정보 없음'}</p>
+              </div>
+              <a href="${perfume.purchaseLink || '#'}" target="_blank" rel="noopener" class="bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-full hover:bg-indigo-600 transition-colors">구매 링크</a>
+            </div>
+          </div>`;
+        recommendationsContainer.innerHTML += card;
+      });
+    }
+
+    function restartQuiz() {
+      resultsScreen.classList.add('hidden');
+      startScreen.classList.remove('hidden');
+      startScreen.classList.add('fade-in');
+    }
+  </script>
+</body>
+</html>
+

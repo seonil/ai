@@ -1,0 +1,11 @@
+{
+  "name": "Scent Finder",
+  "short_name": "ScentFinder",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "description": "AI가 찾아주는 당신의 인생 향수",
+  "icons": []
+}
+
