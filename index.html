@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scent Finder: AI가 찾아주는 당신의 인생 향수</title>
+  <title>Scent Finder: AI가 찾아주는 당신만의 인생 향수</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,9 +33,9 @@
     <section id="start-screen" class="text-center fade-in">
       <div class="bg-white p-8 rounded-2xl shadow-lg">
         <h1 class="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-4">Scent Finder</h1>
-        <p class="text-lg text-gray-600 mb-6">당신의 기억과 감성 속에 숨겨진<br>인생 향수를 찾아드릴게요.</p>
-        <p class="text-gray-500 mb-8">AI가 15가지 질문으로 당신의 취향을 분석합니다.</p>
-        <button id="start-btn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-full hover:bg-indigo-700 transition-colors shadow-md text-lg">내 향수 찾기 시작</button>
+        <p class="text-lg text-gray-600 mb-6">당신의 기억과 감성을 담아<br>인생 향수를 찾아드릴게요.</p>
+        <p class="text-gray-500 mb-8">AI가 15가지 질문으로 당신의 취향을 분석해드려요.</p>
+        <button id="start-btn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-full hover:bg-indigo-700 transition-colors shadow-md text-lg">맞춤 향수 찾기 시작</button>
       </div>
     </section>
 
@@ -64,7 +64,7 @@
       <div class="bg-white p-8 rounded-2xl shadow-lg flex flex-col items-center justify-center min-h-[400px]">
         <div id="loader" class="loader mb-6"></div>
         <h2 id="loading-title" class="text-2xl font-bold text-gray-900 mb-2">Gemini AI가 분석 중입니다.</h2>
-        <p id="loading-message" class="text-gray-600">당신의 감성과 기억 속에서<br>가장 빛나는 향기를 찾는 중...</p>
+        <p id="loading-message" class="text-gray-600">당신의 감성과 기억에서<br>가장 빛나는 향기를 찾는 중...</p>
         <div id="retry-container" class="hidden mt-6">
           <button id="retry-btn" class="bg-red-600 text-white font-bold py-3 px-8 rounded-full hover:bg-red-700 transition-colors">다시 요청</button>
         </div>
@@ -75,7 +75,7 @@
     <section id="results-screen" class="hidden fade-in">
       <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
         <div class="text-center mb-6">
-          <p class="text-sm text-indigo-600 font-semibold">당신의 향기 페르소나</p>
+          <p class="text-sm text-indigo-600 font-semibold">당신만의 향기 페르소나</p>
           <h3 id="persona-title" class="text-2xl md:text-3xl font-bold text-gray-900"></h3>
           <p id="persona-description" class="text-gray-600 mt-2"></p>
         </div>
@@ -114,23 +114,21 @@
 
     // ----- Quiz Data
     const quizData = [
-      { question: "당신의 오늘 기분을 색으로 표현한다면?", type: 'single', options: ["맑은 하늘 같은 파랑", "따뜻한 햇살 같은 노랑", "잔잔한 초록", "차분한 회색"] },
-      { question: "향수로 표현하고 싶은 분위기는?", type: 'multiple', options: ["깨끗하고 신선한", "따뜻하고 포근한", "세련되고 도시적인", "자연적이고 편안한", "관능적이고 대담한"] },
-      { question: "아침에 일어났을 때 가장 먼저 떠오르는 향은?", type: 'single', options: ["막 갓 내린 커피 향", "빨래한 셔츠의 비누 향", "창문 열 때 들어오는 바람 냄새", "따뜻한 나무 가구의 향"] },
-      { question: "좋아하는 계절과 그 계절에서 떠오르는 향은?", type: 'multiple', options: ["봄 – 꽃향기, 새싹의 풋내", "여름 – 바닷바람, 시트러스", "가을 – 낙엽, 스파이스", "겨울 – 머스크, 앰버"] },
-      { question: "기억 속 깊이 남아 있는 향은?", type: 'single', options: ["누군가의 따뜻한 체취", "비 온 뒤 흙냄새", "서점의 종이 냄새", "병원/약국의 약 냄새"] },
-      { question: "당신의 이상적인 데이트 장소는?", type: 'multiple', options: ["한적한 공원", "도심 속 미술관", "분위기 좋은 카페", "바다가 보이는 곳"] },
-      { question: "하루 중 향수의 존재감을 느끼고 싶은 순간은?", type: 'single', options: ["처음 인사할 때", "가까이 다가섰을 때", "지나간 뒤에 남을 때"] },
-      { question: "일상에서 더 끌리는 향의 무드는?", type: 'multiple', options: ["깨끗한 비누/샤워 후 느낌", "부드러운 파우더리", "상큼한 과일/시트러스", "차분한 우디/머스크", "꽃 향기"] },
-      { question: "가장 기억에 남는 여행지의 향기는?", type: 'single', options: ["바닷바람과 소금기", "숲의 흙냄새와 나무향", "도시의 차가운 공기", "시장/베이커리의 달큰한 향"] },
-      { question: "당신의 성향을 한 단어로 표현한다면?", type: 'single', options: ["섬세함", "자유로움", "따뜻함", "카리스마"] },
-      { question: "일할 때 집중을 돕는 향은?", type: 'multiple', options: ["상쾌한 민트/허브", "가벼운 시트러스", "차분한 라벤더", "깊은 나무향"] },
-      { question: "주말에 가장 하고 싶은 활동은?", type: 'single', options: ["카페에서 책 읽기", "자연 속 산책", "집에서 휴식", "전시/공연 감상"] },
-      { question: "평소 즐겨 입는 패션 스타일은?", type: 'multiple', options: ["기본템 위주의 미니멀리즘", "편안하고 활동적인 캐주얼", "여성스러운 라인의 페미닌", "개성 있는 디자인의 유니크/빈티지"] },
-      { question: "혹시 기피하는 향이 있다면?", type: 'single', options: ["속이 울렁이는 지나치게 단 향", "머리 아픈 너무 인공적인 향", "너무 강하고 톡 쏘는 향", "특별히 없음"] },
-      { question: "향수의 지속력은 어느 정도가 중요한가요?", type: 'single', options: ["매우 중요해요 (6시간 이상)", "어느 정도 중요해요 (3-5시간)", "크게 상관없어요"] },
+      { question: "이 향수를 주로 언제, 어디서 사용하고 싶으신가요?", type: 'single', options: ["매일 편안하게 (데일리)", "중요한 미팅·발표 (프로페셔널)", "설레는 데이트·소개팅 (로맨틱)", "친구들과의 즐거운 모임 (소셜)", "혼자만의 휴식 시간 (릴랙스)"] },
+      { question: "어떤 향 계열에 마음이 끌리시나요?", type: 'multiple', options: ["다채로운 꽃의 향연(플로럴)", "달콤 생기 있는 과즙(프루티)", "상큼 청량한 시트러스", "차분한 숲과 나무(우디)", "따뜻하고 이국적인 느낌(스파이시·오리엔탈)", "포근한 비누·살결 느낌(머스크·파우더리)"] },
+      { question: "향수를 통해 표현하고 싶은 이미지는?", type: 'multiple', options: ["세련되고 도시적인", "따뜻하고 부드러운", "관능적이고 매혹적인", "지적이고 신뢰감 있는", "순수하고 깨끗한", "개성 있고 유니크한"] },
+      { question: "평소 즐겨 입는 패션 스타일은?", type: 'multiple', options: ["미니멀·클래식", "캐주얼·스포티", "모던·시크", "페미닌·로맨틱", "유니크·빈티지"] },
+      { question: "가장 좋아하는 하루의 시간대는 언제인가요?", type: 'single', options: ["이슬 맺힌 고요한 새벽", "햇살 쏟아지는 나른한 오후", "붉은 노을의 해질녘", "별이 빛나는 차분한 밤"] },
+      { question: "마음이 편안해지는 장소를 고르세요.", type: 'multiple', options: ["비 온 뒤의 촉촉한 숲속", "파도 소리가 들리는 한적한 해변", "오래된 책 냄새가 나는 서재", "향기로운 꽃이 가득한 정원", "갓 구운 빵 냄새가 나는 골목"] },
+      { question: "선호하는 원단의 감촉은 어떤가요?", type: 'single', options: ["부드럽게 감싸는 캐시미어", "시원하고 쾌적한 린넨", "매끄럽게 흐르는 실크", "깨끗하고 빳빳한 코튼"] },
+      { question: "촉감으로 비유하면 어떤 쪽이 더 끌리나요?", type: 'single', options: ["보송한 파우더", "맑고 투명한 물기", "부드럽고 크리미함", "건조한 나무결", "서늘한 유리감"] },
+      { question: "향의 존재감은 어느 정도가 좋나요?", type: 'single', options: ["내게만 은은하게", "대화 거리에서 느껴짐", "스치면 분명히 전해짐", "공간을 채우는 편"] },
+      { question: "원하는 잔향 길이는?", type: 'single', options: ["2–4시간", "6–8시간", "10시간 이상", "의류에도 오래 남아도 좋음"] },
+      { question: "향에 대한 민감도는?", type: 'single', options: ["쉽게 두통·피로를 느낌", "가끔 민감", "거의 괜찮음"] },
       { question: "향수를 선택할 때 더 중요한 것은?", type: 'single', options: ["많은 사람이 좋아하는 '베스트셀러'", "나만 알고 싶은 '니치 향수'"] },
-      { question: "마지막으로, 당신이 찾고 있는 향기에 대한 느낌이나 단어가 있다면 자유롭게 알려주세요. (선택사항)", type: 'text', placeholder: "예: 비 온 뒤의 흙냄새, 따뜻한 살냄새, 이제 막 세탁한 셔츠의 향기..." }
+      { question: "피하고 싶은 향의 느낌이 있다면?", type: 'single', options: ["너무 달아 울렁거림", "인공적으로 머리 아픔", "톡 쏘듯 자극적임", "스모키·가죽 느낌", "특별히 없음"] },
+      { question: "기피하는 향 노트를 모두 고르세요.", type: 'multiple', options: ["지나치게 달달한 디저트 느낌", "분말가루 같은 파우더감", "축축한 흙·이끼 느낌", "가죽·훈연·타는 나무 느낌", "시나몬·정향 같은 강한 향신 느낌", "과일 캔디처럼 인공 과즙 향", "특별히 없음"] },
+      { question: "당신의 인생 향을 떠오르는 장면이나 단어로 자유롭게 적어주세요.", type: 'text', placeholder: "예: 비 갠 뒤 골목, 막 다린 셔츠, 차가운 유리창, 오후의 햇살" }
     ];
 
     // ----- State
@@ -148,7 +146,7 @@
       displayQuestion();
     }
 
-    function displayQuestion() {
+        function displayQuestion() {
       selectedOptions.clear();
       const question = quizData[currentQuestionIndex];
       const isLast = currentQuestionIndex === quizData.length - 1;
@@ -159,7 +157,7 @@
       nextButton.textContent = isLast ? '결과 보기' : '다음';
 
       if (question.type === 'text') {
-        questionTypeEl.textContent = '주관식 답변 (선택)';
+        questionTypeEl.textContent = '주관식 (자유 입력)';
         document.getElementById('next-button-container').classList.remove('hidden');
         const textArea = document.createElement('textarea');
         textArea.id = 'text-answer';
@@ -169,7 +167,7 @@
         optionsContainer.classList.remove('md:grid-cols-2');
         nextButton.disabled = false;
       } else {
-        questionTypeEl.textContent = question.type === 'multiple' ? '중복 선택 가능' : '하나만 선택';
+        questionTypeEl.textContent = question.type === 'multiple' ? '복수 선택 가능' : '단일 선택';
         document.getElementById('next-button-container').classList.toggle('hidden', question.type === 'single');
         optionsContainer.classList.add('md:grid-cols-2');
         question.options.forEach((optionText, index) => {
@@ -183,6 +181,7 @@
         updateNextButtonState();
       }
     }
+
 
     function toggleOption(card, type) {
       if (isProcessing) return;
@@ -239,8 +238,8 @@
       loadingScreen.classList.remove('hidden');
       loader.classList.remove('hidden');
       retryContainer.classList.add('hidden');
-      loadingTitle.textContent = 'AI가 분석중입니다.';
-      loadingMessage.innerHTML = '당신의 감성과 기억 속에서<br>가장 빛나는 향기를 찾는 중...';
+      loadingTitle.textContent = 'AI가 분석 중입니다.';
+      loadingMessage.innerHTML = '당신의 감성과 기억에서<br>가장 빛나는 향기를 찾는 중...';
       try {
         const result = await callGeminiAPI(userAnswers);
         displayResults(result);
@@ -248,7 +247,7 @@
         console.error('AI analysis error:', error);
         loader.classList.add('hidden');
         loadingTitle.textContent = '오류 발생';
-        loadingMessage.innerHTML = '죄송합니다, 분석 중 오류가 발생했습니다.<br>잠시 후 다시 시도해주세요.';
+        loadingMessage.innerHTML = '죄송합니다. 분석 중 오류가 발생했습니다.<br>다시 한 번 시도해주세요.';
         retryContainer.classList.remove('hidden');
       }
     }
@@ -282,7 +281,7 @@
               <div class="flex-grow">
                 <div class="flex justify-between items-start">
                   <div>
-                    <p class="text-sm text-indigo-600 font-semibold">${perfume.brand || ''}</p>
+                    <p class="text-sm text-indigo-600 font-semibold">${perfume.brand || ""}</p>
                     <h4 class="text-lg md:text-xl font-bold text-gray-900">${perfume.name || ''}</h4>
                   </div>
                   <span class="text-xs font-bold bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full whitespace-nowrap ml-2">추천 ${index + 1}</span>
@@ -313,4 +312,9 @@
   </script>
 </body>
 </html>
+
+
+
+
+
 
