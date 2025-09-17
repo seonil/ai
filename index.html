@@ -283,7 +283,7 @@
       <div class="card hero-card p-8 md:p-10 text-center max-w-xl mx-auto">
         <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4">Scent Finder</h1>
         <p class="text-lg text-muted mb-6 leading-relaxed">당신의 기억과 감성을 담아<br>인생 향수를 찾아드릴게요.</p>
-        <p class="text-soft mb-8">AI가 17가지 질문으로 당신의 취향을 분석해드려요.</p>
+        <p class="text-soft mb-8">AI가 당신의 취향을 분석해드려요.</p>
         <button id="start-btn" class="btn-primary">맞춤 향수 찾기 시작</button>
       </div>
     </section>
@@ -293,7 +293,7 @@
       <div class="card p-6 md:p-8">
         <div class="mb-6">
           <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-semibold text-accent tracking-wide uppercase">Question <span id="question-number"></span>/17</span>
+            <span class="text-sm font-semibold text-accent tracking-wide uppercase">Question <span id="question-number"></span>/18</span>
             <span id="question-type" class="text-xs text-soft tracking-wide uppercase"></span>
           </div>
           <div class="progress-track w-full rounded-full h-2.5">
@@ -363,6 +363,7 @@
 
     // ----- Quiz Data
     const quizData = [
+      { question: "어떤 타입의 향수를 찾고 계신가요?", type: 'single', options: ["남성향수", "여성향수", "젠더뉴트럴 향수", "상관없음 (모든 타입)"] },
       { question: "이 향수를 주로 언제, 어디서 사용하고 싶으신가요?", type: 'single', options: ["매일 편안하게 (데일리)", "중요한 미팅·발표 (프로페셔널)", "설레는 데이트·소개팅 (로맨틱)", "친구들과의 즐거운 모임 (소셜)", "혼자만의 휴식 시간 (릴랙스)"] },
       { question: "어떤 향 계열에 마음이 끌리시나요?", type: 'multiple', options: ["다채로운 꽃의 향연(플로럴)", "달콤 생기 있는 과즙(프루티)", "상큼 청량한 시트러스", "차분한 숲과 나무(우디)", "따뜻하고 이국적인 느낌(스파이시·오리엔탈)", "포근한 비누·살결 느낌(머스크·파우더리)"] },
       { question: "향수를 통해 표현하고 싶은 이미지는?", type: 'multiple', options: ["세련되고 도시적인", "따뜻하고 부드러운", "관능적이고 매혹적인", "지적이고 신뢰감 있는", "순수하고 깨끗한", "개성 있고 유니크한"] },
