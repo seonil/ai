@@ -192,13 +192,13 @@
       background: rgba(255, 255, 255, 0.9);
       border: 1px solid rgba(83, 72, 63, 0.1);
       border-radius: 18px;
-      padding: 1.25rem;
+      padding: 1rem;
       cursor: pointer;
       transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
     }
 
     .option-card.compact {
-      padding: 0.9rem;
+      padding: 0.75rem;
       font-size: 0.9rem;
       border-radius: 14px;
     }
@@ -301,8 +301,8 @@
           </div>
         </div>
         <h2 id="question-title" class="text-2xl md:text-3xl font-bold mb-6 leading-snug"></h2>
-        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        <div id="button-container" class="mt-8 flex justify-between items-center gap-4">
+        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+        <div id="button-container" class="mt-6 flex justify-between items-center gap-4">
           <button id="prev-button" class="btn-secondary hidden">이전</button>
           <button id="next-button" class="btn-primary">다음</button>
         </div>
@@ -566,6 +566,8 @@
       currentQuestionIndex++;
       if (currentQuestionIndex < quizData.length) {
         displayQuestion();
+        // 페이지 최상단으로 스크롤
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         showLoadingAndAnalyze();
       }
@@ -579,6 +581,8 @@
           userAnswers.pop();
         }
         displayQuestion();
+        // 페이지 최상단으로 스크롤
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
 
