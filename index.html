@@ -329,8 +329,14 @@
     <!-- Quiz Screen -->
     <section id="quiz-screen" class="hidden quiz-section">
       <div class="card p-6 md:p-8">
-        <div class="text-center mb-6">
+        <div class="flex justify-between items-center mb-6">
+          <div></div>
           <h1 class="text-2xl font-serif font-bold text-accent">Scent Finder</h1>
+          <button id="quiz-home-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors" title="처음으로 돌아가기">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-accent">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m3 12 2-2m0 0 7-7 7 7M5 10v10a1 1 0 0 0 1 1h3m0-11h4l2 2m5-2v10a1 1 0 0 1-1 1h-3m-6 0a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1m-6 0h6"/>
+            </svg>
+          </button>
         </div>
         <div class="mb-6">
           <div class="flex justify-between items-center mb-2">
@@ -348,17 +354,20 @@
           <div class="flex-grow"></div>
           <button id="next-button" class="btn-primary">다음</button>
         </div>
-        <div class="mt-6 text-center">
-          <button id="quiz-restart-btn" class="btn-outline text-sm">처음으로 돌아가기</button>
-        </div>
       </div>
     </section>
 
     <!-- Loading Screen -->
     <section id="loading-screen" class="hidden text-center fade-in">
       <div class="card p-8 flex flex-col items-center justify-center min-h-[400px]">
-        <div class="mb-6">
+        <div class="w-full flex justify-between items-center mb-6">
+          <div></div>
           <h1 class="text-2xl font-serif font-bold text-accent">Scent Finder</h1>
+          <button id="loading-home-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors" title="처음으로 돌아가기">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-accent">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m3 12 2-2m0 0 7-7 7 7M5 10v10a1 1 0 0 0 1 1h3m0-11h4l2 2m5-2v10a1 1 0 0 1-1 1h-3m-6 0a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1m-6 0h6"/>
+            </svg>
+          </button>
         </div>
         <div id="loader" class="loader mb-6"></div>
         <h2 id="loading-title" class="text-2xl font-bold mb-2">AI가 분석 중입니다.</h2>
@@ -366,17 +375,20 @@
         <div id="retry-container" class="hidden mt-6">
           <button id="retry-btn" class="btn-outline">다시 요청</button>
         </div>
-        <div class="mt-6">
-          <button id="loading-restart-btn" class="btn-outline text-sm">처음으로 돌아가기</button>
-        </div>
       </div>
     </section>
 
     <!-- Results Screen -->
     <section id="results-screen" class="hidden fade-in">
       <div class="card p-6 md:p-8">
-        <div class="text-center mb-6">
-          <h1 class="text-2xl font-serif font-bold text-accent mb-4">Scent Finder</h1>
+        <div class="flex justify-between items-center mb-6">
+          <div></div>
+          <h1 class="text-2xl font-serif font-bold text-accent">Scent Finder</h1>
+          <button id="results-home-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors" title="처음으로 돌아가기">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-accent">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m3 12 2-2m0 0 7-7 7 7M5 10v10a1 1 0 0 0 1 1h3m0-11h4l2 2m5-2v10a1 1 0 0 1-1 1h-3m-6 0a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1m-6 0h6"/>
+            </svg>
+          </button>
         </div>
         <div class="text-center mb-6">
           <p id="result-badge" class="badge-gold">당신만의 향기 페르소나</p>
@@ -385,9 +397,6 @@
         </div>
         <div id="notes-container" class="notes-grid hidden"></div>
         <div id="recommendations-container" class="space-y-4"></div>
-        <div class="mt-8 text-center">
-          <button id="restart-btn" class="btn-secondary">처음으로 돌아가기</button>
-        </div>
       </div>
     </section>
   </div>
@@ -397,7 +406,6 @@
     const startDiscoverBtn = document.getElementById("discover-btn");
     const startCreateBtn = document.getElementById("create-btn");
     const retryBtn = document.getElementById("retry-btn");
-    const restartBtn = document.getElementById("restart-btn");
     const startScreen = document.getElementById("start-screen");
     const quizScreen = document.getElementById("quiz-screen");
     const loadingScreen = document.getElementById("loading-screen");
@@ -425,9 +433,9 @@
     nextButton.addEventListener("click", nextQuestion);
     document.getElementById("prev-button").addEventListener("click", prevQuestion);
     retryBtn.addEventListener("click", showLoadingAndAnalyze);
-    restartBtn.addEventListener("click", restartQuiz);
-    document.getElementById("quiz-restart-btn").addEventListener("click", restartQuiz);
-    document.getElementById("loading-restart-btn").addEventListener("click", restartQuiz);
+    document.getElementById("quiz-home-btn").addEventListener("click", restartQuiz);
+    document.getElementById("loading-home-btn").addEventListener("click", restartQuiz);
+    document.getElementById("results-home-btn").addEventListener("click", restartQuiz);
 
     // ----- Quiz Data
     const discoverQuizData = [
