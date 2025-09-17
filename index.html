@@ -79,7 +79,7 @@
     }
 
     .hero-card {
-      background: none;
+      background: linear-gradient(115deg, rgba(255, 255, 255, 0.92) 0%, rgba(247, 242, 233, 0.85) 40%, rgba(247, 242, 233, 0.5) 100%);
       background-image: url('/assets/perfume-hero.png');
       background-size: cover;
       background-position: center right;
@@ -197,6 +197,12 @@
       transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
     }
 
+    .option-card.compact {
+      padding: 0.9rem;
+      font-size: 0.9rem;
+      border-radius: 14px;
+    }
+
     .option-card:hover {
       transform: translateY(-4px);
       box-shadow: var(--soft-shadow);
@@ -277,7 +283,7 @@
       <div class="card hero-card p-8 md:p-10 text-center max-w-xl mx-auto">
         <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4">Scent Finder</h1>
         <p class="text-lg text-muted mb-6 leading-relaxed">당신의 기억과 감성을 담아<br>인생 향수를 찾아드릴게요.</p>
-        <p class="text-soft mb-8">AI가 15가지 질문으로 당신의 취향을 분석해드려요.</p>
+        <p class="text-soft mb-8">AI가 17가지 질문으로 당신의 취향을 분석해드려요.</p>
         <button id="start-btn" class="btn-primary">맞춤 향수 찾기 시작</button>
       </div>
     </section>
@@ -287,7 +293,7 @@
       <div class="card p-6 md:p-8">
         <div class="mb-6">
           <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-semibold text-accent tracking-wide uppercase">Question <span id="question-number"></span>/15</span>
+            <span class="text-sm font-semibold text-accent tracking-wide uppercase">Question <span id="question-number"></span>/17</span>
             <span id="question-type" class="text-xs text-soft tracking-wide uppercase"></span>
           </div>
           <div class="progress-track w-full rounded-full h-2.5">
@@ -370,7 +376,9 @@
       { question: "향에 대한 민감도는?", type: 'single', options: ["쉽게 두통·피로를 느낌", "가끔 민감", "거의 괜찮음"] },
       { question: "향수를 선택할 때 더 중요한 것은?", type: 'single', options: ["많은 사람이 좋아하는 '베스트셀러'", "나만 알고 싶은 '니치 향수'"] },
       { question: "피하고 싶은 향의 느낌이 있다면?", type: 'single', options: ["너무 달아 울렁거리는 향", "인공적으로 머리 아픈 향", "톡 쏘듯 자극적인 향", "스모키·가죽 느낌의 향", "특별히 없음"] },
-      { question: "당신의 인생 향을 떠오르는 장면이나 단어로 자유롭게 적어주세요.", type: 'text', placeholder: "예: 비 갠 뒤 골목, 막 다린 셔츠, 차가운 유리창, 오후의 햇살" }
+      { question: "당신의 인생 향을 떠오르는 장면이나 단어로 자유롭게 적어주세요.", type: 'text', placeholder: "예: 비 갠 뒤 골목, 막 다린 셔츠, 차가운 유리창, 오후의 햇살" },
+      { question: "특별히 선호하는 향수 하우스가 있나요? (선택사항)", type: 'multiple_optional', options: ["샤넬 (CHANEL)", "디올 (DIOR)", "톰 포드 (TOM FORD)", "조 말론 (JO MALONE)", "크리드 (CREED)", "메종 마르지엘라 (MAISON MARGIELA)", "펜할리곤스 (PENHALIGON'S)", "르 라보 (LE LABO)", "바이레도 (BYREDO)", "랑방 (LANVIN)", "겔랑 (GUERLAIN)", "에르메스 (HERMÈS)", "프레데릭 말 (FRÉDÉRIC MALLE)", "라르티잔 파퓨뫼르 (L'ARTISAN PARFUMEUR)", "니시아네 (NISHANE)"], hasTextInput: true, textPlaceholder: "다른 선호 브랜드가 있다면 적어주세요" },
+      { question: "배제하고 싶은 향수 하우스가 있나요? (선택사항)", type: 'multiple_optional', options: ["샤넬 (CHANEL)", "디올 (DIOR)", "톰 포드 (TOM FORD)", "조 말론 (JO MALONE)", "크리드 (CREED)", "메종 마르지엘라 (MAISON MARGIELA)", "펜할리곤스 (PENHALIGON'S)", "르 라보 (LE LABO)", "바이레도 (BYREDO)", "랑방 (LANVIN)", "겔랑 (GUERLAIN)", "에르메스 (HERMÈS)", "프레데릭 말 (FRÉDÉRIC MALLE)", "라르티잔 파퓨뫼르 (L'ARTISAN PARFUMEUR)", "니시아네 (NISHANE)"], hasTextInput: true, textPlaceholder: "다른 배제하고 싶은 브랜드가 있다면 적어주세요" }
     ];
 
     // ----- State
@@ -409,17 +417,41 @@
         optionsContainer.classList.remove('md:grid-cols-2');
         nextButton.disabled = false;
       } else {
-        questionTypeEl.textContent = question.type === 'multiple' ? '복수 선택 가능' : '단일 선택';
-        document.getElementById('next-button-container').classList.toggle('hidden', question.type === 'single');
-        optionsContainer.classList.add('md:grid-cols-2');
+        const isOptional = question.type === 'multiple_optional';
+        const isMultiple = question.type === 'multiple' || question.type === 'multiple_optional';
+        questionTypeEl.textContent = isMultiple ? (isOptional ? '복수 선택 가능 (선택사항)' : '복수 선택 가능') : '단일 선택';
+        document.getElementById('next-button-container').classList.remove('hidden');
+
+        const isPerfumeHouseQuestion = question.options.length > 8;
+        if (isPerfumeHouseQuestion) {
+          optionsContainer.classList.add('md:grid-cols-3', 'lg:grid-cols-4');
+        } else {
+          optionsContainer.classList.add('md:grid-cols-2');
+        }
+
         question.options.forEach((optionText, index) => {
           const card = document.createElement('div');
-          card.className = 'option-card text-left';
+          const cardClass = isPerfumeHouseQuestion ? 'option-card compact text-left' : 'option-card text-left';
+          card.className = cardClass;
           card.textContent = optionText;
           card.dataset.optionIndex = index;
           card.onclick = () => toggleOption(card, question.type);
           optionsContainer.appendChild(card);
         });
+
+        // 텍스트 입력 필드 추가
+        if (question.hasTextInput) {
+          const textInputContainer = document.createElement('div');
+          textInputContainer.className = 'col-span-full mt-4';
+          const textInput = document.createElement('input');
+          textInput.type = 'text';
+          textInput.id = 'additional-text-input';
+          textInput.className = 'w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgba(201,169,106,0.45)] focus:border-[rgba(201,169,106,0.8)] transition';
+          textInput.placeholder = question.textPlaceholder;
+          textInputContainer.appendChild(textInput);
+          optionsContainer.appendChild(textInputContainer);
+        }
+
         updateNextButtonState();
       }
     }
@@ -453,6 +485,8 @@
       const q = quizData[currentQuestionIndex];
       if (q.type === 'multiple') {
         nextButton.disabled = selectedOptions.size === 0;
+      } else if (q.type === 'multiple_optional') {
+        nextButton.disabled = false; // 선택사항이므로 항상 활성화
       }
     }
 
@@ -463,8 +497,20 @@
         userAnswers.push({ question: question.question, answers: [textAnswer] });
       } else {
         const selectedTexts = Array.from(selectedOptions).map(index => question.options[parseInt(index)]);
-        if (selectedTexts.length > 0) {
-          userAnswers.push({ question: question.question, answers: selectedTexts });
+        const answers = [...selectedTexts];
+
+        // 추가 텍스트 입력이 있는 경우 포함
+        if (question.hasTextInput) {
+          const additionalTextInput = document.getElementById('additional-text-input');
+          const additionalText = (additionalTextInput?.value || '').trim();
+          if (additionalText) {
+            answers.push(additionalText);
+          }
+        }
+
+        // 선택사항 질문은 답변이 없어도 저장
+        if (question.type === 'multiple_optional' || answers.length > 0) {
+          userAnswers.push({ question: question.question, answers: answers });
         }
       }
       currentQuestionIndex++;
