@@ -506,7 +506,13 @@
         optionsContainer.appendChild(textArea);
         nextButton.disabled = false;
       } else {
-        questionTypeEl.textContent = question.type === "multiple" ? "복수 선택 가능" : "단일 선택";
+        if (question.type === "multiple") {
+          questionTypeEl.textContent = "복수 선택 가능";
+        } else if (question.type === "multiple_optional") {
+          questionTypeEl.textContent = "복수 선택 가능 (선택사항)";
+        } else {
+          questionTypeEl.textContent = "단일 선택";
+        }
 
         optionsContainer.classList.add("md:grid-cols-2");
         question.options.forEach((optionText, index) => {
@@ -518,7 +524,23 @@
           optionsContainer.appendChild(card);
         });
 
-        nextButton.disabled = true;
+        // 텍스트 입력 필드 추가 (multiple_optional에서 hasTextInput이 있는 경우)
+        if (question.type === "multiple_optional" && question.hasTextInput) {
+          const textInputDiv = document.createElement("div");
+          textInputDiv.className = "col-span-full mt-4";
+
+          const textInput = document.createElement("input");
+          textInput.type = "text";
+          textInput.id = "optional-text-input";
+          textInput.className = "w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgba(201,169,106,0.45)] focus:border-[rgba(201,169,106,0.8)] transition";
+          textInput.placeholder = question.textPlaceholder || "";
+
+          textInputDiv.appendChild(textInput);
+          optionsContainer.appendChild(textInputDiv);
+        }
+
+        // multiple_optional은 선택사항이므로 처음부터 다음 버튼 활성화
+        nextButton.disabled = question.type === "multiple" || question.type === "single";
       }
     }
 
@@ -534,7 +556,7 @@
         selectedOptions.clear();
         selectedOptions.add(optionIndex);
         nextButton.disabled = false;
-      } else {
+      } else if (type === "multiple" || type === "multiple_optional") {
         if (selectedOptions.has(optionIndex)) {
           selectedOptions.delete(optionIndex);
           card.classList.remove("selected");
@@ -550,6 +572,8 @@
       const question = currentQuizData[currentQuestionIndex];
       if (question.type === "multiple") {
         nextButton.disabled = selectedOptions.size === 0;
+      } else if (question.type === "multiple_optional") {
+        nextButton.disabled = false; // 선택사항이므로 항상 활성화
       }
     }
 
@@ -557,6 +581,18 @@
       if (question.type === "text") {
         const textAnswer = (document.getElementById("text-answer")?.value || "").trim();
         userAnswers.push({ question: question.question, answers: [textAnswer] });
+      } else if (question.type === "multiple_optional") {
+        const selectedTexts = Array.from(selectedOptions).map(index => question.options[parseInt(index, 10)]);
+        const optionalTextInput = document.getElementById("optional-text-input");
+        const optionalText = optionalTextInput ? optionalTextInput.value.trim() : "";
+
+        const allAnswers = [...selectedTexts];
+        if (optionalText) {
+          allAnswers.push(optionalText);
+        }
+
+        // multiple_optional은 빈 답변도 허용
+        userAnswers.push({ question: question.question, answers: allAnswers });
       } else {
         const selectedTexts = Array.from(selectedOptions).map(index => question.options[parseInt(index, 10)]);
         if (selectedTexts.length > 0) {
