@@ -302,8 +302,9 @@
         </div>
         <h2 id="question-title" class="text-2xl md:text-3xl font-bold mb-6 leading-snug"></h2>
         <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        <div id="next-button-container" class="mt-8 text-center">
-          <button id="next-button" class="btn-primary w-full md:w-auto">다음</button>
+        <div id="button-container" class="mt-8 flex flex-col sm:flex-row gap-4 justify-between items-center">
+          <button id="prev-button" class="btn-secondary hidden">이전</button>
+          <button id="next-button" class="btn-primary w-full sm:w-auto">다음</button>
         </div>
       </div>
     </section>
@@ -351,6 +352,7 @@
     const questionTitleEl = document.getElementById('question-title');
     const optionsContainer = document.getElementById('options-container');
     const nextButton = document.getElementById('next-button');
+    const prevButton = document.getElementById('prev-button');
     const loader = document.getElementById('loader');
     const retryContainer = document.getElementById('retry-container');
     const loadingTitle = document.getElementById('loading-title');
@@ -358,6 +360,7 @@
 
     startBtn.addEventListener('click', startQuiz);
     nextButton.addEventListener('click', nextQuestion);
+    prevButton.addEventListener('click', prevQuestion);
     retryBtn.addEventListener('click', showLoadingAndAnalyze);
     restartBtn.addEventListener('click', restartQuiz);
 
@@ -401,19 +404,52 @@
       selectedOptions.clear();
       const question = quizData[currentQuestionIndex];
       const isLast = currentQuestionIndex === quizData.length - 1;
+      const isFirst = currentQuestionIndex === 0;
       questionNumberEl.textContent = currentQuestionIndex + 1;
       progressBarEl.style.width = `${((currentQuestionIndex + 1) / quizData.length) * 100}%`;
       questionTitleEl.textContent = question.question;
       optionsContainer.innerHTML = '';
       nextButton.textContent = isLast ? '결과 보기' : '다음';
 
+      // 이전 버튼 표시/숨김
+      if (isFirst) {
+        prevButton.classList.add('hidden');
+      } else {
+        prevButton.classList.remove('hidden');
+      }
+
+      // 이전 답변이 있다면 복원
+      const previousAnswer = userAnswers[currentQuestionIndex];
+      let previousTextValue = '';
+      if (previousAnswer && previousAnswer.answers) {
+        // 텍스트 입력이 있는 경우, 마지막 항목이 텍스트 입력일 수 있음
+        if (question.hasTextInput && previousAnswer.answers.length > 0) {
+          const lastAnswer = previousAnswer.answers[previousAnswer.answers.length - 1];
+          if (!question.options.includes(lastAnswer)) {
+            previousTextValue = lastAnswer;
+            previousAnswer.answers = previousAnswer.answers.slice(0, -1);
+          }
+        }
+        // 선택된 옵션들 복원
+        previousAnswer.answers.forEach(answer => {
+          const index = question.options.indexOf(answer);
+          if (index !== -1) {
+            selectedOptions.add(index.toString());
+          }
+        });
+      }
+
       if (question.type === 'text') {
         questionTypeEl.textContent = '주관식 (자유 입력)';
-        document.getElementById('next-button-container').classList.remove('hidden');
+        document.getElementById('button-container').classList.remove('hidden');
         const textArea = document.createElement('textarea');
         textArea.id = 'text-answer';
         textArea.className = 'w-full h-32 p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgba(201,169,106,0.45)] focus:border-[rgba(201,169,106,0.8)] transition';
         textArea.placeholder = question.placeholder;
+        // 이전 답변 복원
+        if (previousAnswer && previousAnswer.answers && previousAnswer.answers[0]) {
+          textArea.value = previousAnswer.answers[0];
+        }
         optionsContainer.appendChild(textArea);
         optionsContainer.classList.remove('md:grid-cols-2');
         nextButton.disabled = false;
@@ -421,7 +457,7 @@
         const isOptional = question.type === 'multiple_optional';
         const isMultiple = question.type === 'multiple' || question.type === 'multiple_optional';
         questionTypeEl.textContent = isMultiple ? (isOptional ? '복수 선택 가능 (선택사항)' : '복수 선택 가능') : '단일 선택';
-        document.getElementById('next-button-container').classList.remove('hidden');
+        document.getElementById('button-container').classList.remove('hidden');
 
         const isPerfumeHouseQuestion = question.options.length > 8;
         if (isPerfumeHouseQuestion) {
@@ -437,6 +473,10 @@
           card.textContent = optionText;
           card.dataset.optionIndex = index;
           card.onclick = () => toggleOption(card, question.type);
+          // 이전에 선택된 옵션이면 선택된 상태로 표시
+          if (selectedOptions.has(index.toString())) {
+            card.classList.add('selected');
+          }
           optionsContainer.appendChild(card);
         });
 
@@ -449,6 +489,10 @@
           textInput.id = 'additional-text-input';
           textInput.className = 'w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgba(201,169,106,0.45)] focus:border-[rgba(201,169,106,0.8)] transition';
           textInput.placeholder = question.textPlaceholder;
+          // 이전 텍스트 입력 값 복원
+          if (previousTextValue) {
+            textInput.value = previousTextValue;
+          }
           textInputContainer.appendChild(textInput);
           optionsContainer.appendChild(textInputContainer);
         }
@@ -519,6 +563,17 @@
         displayQuestion();
       } else {
         showLoadingAndAnalyze();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        // 이전 답변 제거
+        if (userAnswers.length > 0) {
+          userAnswers.pop();
+        }
+        displayQuestion();
       }
     }
 
