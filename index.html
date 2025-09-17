@@ -331,7 +331,7 @@
       <div class="card p-6 md:p-8">
         <div class="mb-6">
           <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-semibold text-accent tracking-wide uppercase">Question <span id="question-number"></span>/18</span>
+            <span class="text-sm font-semibold text-accent tracking-wide uppercase">Question <span id="question-number"></span>/<span id="question-total"></span></span>
             <span id="question-type" class="text-xs text-soft tracking-wide uppercase"></span>
           </div>
           <div class="progress-track w-full rounded-full h-2.5">
@@ -378,68 +378,71 @@
 
   <script>
     // ----- Elements
-    const startDiscoverBtn = document.getElementById('discover-btn');
-    const startCreateBtn = document.getElementById('create-btn');
-    const retryBtn = document.getElementById('retry-btn');
-    const restartBtn = document.getElementById('restart-btn');
-    const startScreen = document.getElementById('start-screen');
-    const quizScreen = document.getElementById('quiz-screen');
-    const loadingScreen = document.getElementById('loading-screen');
-    const resultsScreen = document.getElementById('results-screen');
-    const questionNumberEl = document.getElementById('question-number');
-    const questionTotalEl = document.getElementById('question-total');
-    const questionTypeEl = document.getElementById('question-type');
-    const progressBarEl = document.getElementById('progress-bar');
-    const questionTitleEl = document.getElementById('question-title');
-    const optionsContainer = document.getElementById('options-container');
-    const nextButton = document.getElementById('next-button');
-    const loader = document.getElementById('loader');
-    const retryContainer = document.getElementById('retry-container');
-    const loadingTitle = document.getElementById('loading-title');
-    const loadingMessage = document.getElementById('loading-message');
-    const resultBadge = document.getElementById('result-badge');
-    const resultTitle = document.getElementById('result-title');
-    const resultDescription = document.getElementById('result-description');
-    const notesContainer = document.getElementById('notes-container');
-    const recommendationsContainer = document.getElementById('recommendations-container');
+    const startDiscoverBtn = document.getElementById("discover-btn");
+    const startCreateBtn = document.getElementById("create-btn");
+    const retryBtn = document.getElementById("retry-btn");
+    const restartBtn = document.getElementById("restart-btn");
+    const startScreen = document.getElementById("start-screen");
+    const quizScreen = document.getElementById("quiz-screen");
+    const loadingScreen = document.getElementById("loading-screen");
+    const resultsScreen = document.getElementById("results-screen");
+    const questionNumberEl = document.getElementById("question-number");
+    const questionTotalEl = document.getElementById("question-total");
+    const questionTypeEl = document.getElementById("question-type");
+    const progressBarEl = document.getElementById("progress-bar");
+    const questionTitleEl = document.getElementById("question-title");
+    const optionsContainer = document.getElementById("options-container");
+    const nextButton = document.getElementById("next-button");
+    const nextButtonContainer = document.getElementById("next-button-container");
+    const loader = document.getElementById("loader");
+    const retryContainer = document.getElementById("retry-container");
+    const loadingTitle = document.getElementById("loading-title");
+    const loadingMessage = document.getElementById("loading-message");
+    const resultBadge = document.getElementById("result-badge");
+    const resultTitle = document.getElementById("result-title");
+    const resultDescription = document.getElementById("result-description");
+    const notesContainer = document.getElementById("notes-container");
+    const recommendationsContainer = document.getElementById("recommendations-container");
 
-    startDiscoverBtn.addEventListener('click', () => startQuiz('discover'));
-    startCreateBtn.addEventListener('click', () => startQuiz('create'));
-    nextButton.addEventListener('click', nextQuestion);
-    retryBtn.addEventListener('click', showLoadingAndAnalyze);
-    restartBtn.addEventListener('click', restartQuiz);
+    startDiscoverBtn.addEventListener("click", () => startQuiz("discover"));
+    startCreateBtn.addEventListener("click", () => startQuiz("create"));
+    nextButton.addEventListener("click", nextQuestion);
+    document.getElementById("prev-button").addEventListener("click", prevQuestion);
+    retryBtn.addEventListener("click", showLoadingAndAnalyze);
+    restartBtn.addEventListener("click", restartQuiz);
 
     // ----- Quiz Data
     const discoverQuizData = [
-      { question: '어떤 타입의 향수를 찾고 계신가요?', type: 'single', options: ['남성향수', '여성향수', '젠더뉴트럴 향수', '상관없음 (모든 타입)'] },
-      { question: '이 향수를 주로 언제, 어디서 사용하고 싶으신가요?', type: 'single', options: ['매일 편안하게 (데일리)', '중요한 미팅·발표 (프로페셔널)', '설레는 데이트·소개팅 (로맨틱)', '친구들과의 즐거운 모임 (소셜)', '혼자만의 휴식 시간 (릴랙스)'] },
-      { question: '어떤 향 계열에 마음이 끌리시나요?', type: 'multiple', options: ['다채로운 꽃의 향연(플로럴)', '달콤 생기 있는 과즙(프루티)', '상큼 청량한 시트러스', '차분한 숲과 나무(우디)', '따뜻하고 이국적인 느낌(스파이시·오리엔탈)', '포근한 비누·살결 느낌(머스크·파우더리)'] },
-      { question: '향수를 통해 표현하고 싶은 이미지는?', type: 'multiple', options: ['세련되고 도시적인', '따뜻하고 부드러운', '관능적이고 매혹적인', '지적이고 신뢰감 있는', '순수하고 깨끗한', '개성 있고 유니크한'] },
-      { question: '평소 즐겨 입는 패션 스타일은?', type: 'multiple', options: ['미니멀·클래식', '캐주얼·스포티', '모던·시크', '페미닌·로맨틱', '유니크·빈티지'] },
-      { question: '가장 좋아하는 하루의 시간대는 언제인가요?', type: 'single', options: ['이슬 맺힌 고요한 새벽', '햇살 쏟아지는 나른한 오후', '붉은 노을의 해질녘', '별이 빛나는 차분한 밤'] },
-      { question: '마음이 편안해지는 장소를 고르세요.', type: 'multiple', options: ['비 온 뒤의 촉촉한 숲속', '파도 소리가 들리는 한적한 해변', '오래된 책 냄새가 나는 서재', '향기로운 꽃이 가득한 정원', '갓 구운 빵 냄새가 나는 골목'] },
-      { question: '선호하는 원단의 감촉은 어떤가요?', type: 'single', options: ['부드럽게 감싸는 캐시미어', '시원하고 쾌적한 린넨', '매끄럽게 흐르는 실크', '깨끗하고 빳빳한 코튼'] },
-      { question: '촉감으로 비유하면 어떤 쪽이 더 끌리나요?', type: 'single', options: ['보송한 파우더', '맑고 투명한 물기', '부드럽고 크리미함', '건조한 나무결', '서늘한 유리감'] },
-      { question: '향의 존재감은 어느 정도가 좋나요?', type: 'single', options: ['내게만 은은하게', '대화 거리에서 느껴짐', '스치면 분명히 전해짐', '공간을 채우는 편'] },
-      { question: '원하는 잔향 길이는?', type: 'single', options: ['2–4시간', '6–8시간', '10시간 이상', '의류에도 오래 남아도 좋음'] },
-      { question: '향에 대한 민감도는?', type: 'single', options: ['쉽게 두통·피로를 느낌', '가끔 민감', '거의 괜찮음'] },
-      { question: '향수를 선택할 때 더 중요한 것은?', type: 'single', options: ['많은 사람이 좋아하는 '베스트셀러'', '나만 알고 싶은 '니치 향수''] },
-      { question: '피하고 싶은 향의 느낌이 있다면?', type: 'single', options: ['너무 달아 울렁거림', '인공적으로 머리 아픔', '톡 쏘듯 자극적임', '스모키·가죽 느낌', '특별히 없음'] },
-      { question: '기피하는 향 노트를 모두 고르세요.', type: 'multiple', options: ['지나치게 달달한 디저트 느낌', '진한 흰꽃의 화사함', '분말가루 같은 파우더감', '축축한 흙·이끼 느낌', '가죽·훈연·타는 나무 느낌', '바닷물·세제 같은 느낌', '시나몬·정향 같은 강한 향신 느낌', '약품·멘톨 같은 의약품 느낌', '과일 캔디처럼 인공 과즙 느낌', '레몬 세제 같은 청소세제 느낌', '특별히 없음'] },
-      { question: '당신의 인생 향을 떠오르는 장면이나 단어로 자유롭게 적어주세요.', type: 'text', placeholder: '예: 비 갠 뒤 골목, 막 다린 셔츠, 차가운 유리창, 오후의 햇살' }
+    { question: "어떤 타입의 향수를 찾고 계신가요?", type: 'single', options: ["남성향수", "여성향수", "젠더뉴트럴 향수", "상관없음 (모든 타입)"] },
+      { question: "이 향수를 주로 언제, 어디서 사용하고 싶으신가요?", type: 'single', options: ["매일 편안하게 (데일리)", "중요한 미팅·발표 (프로페셔널)", "설레는 데이트·소개팅 (로맨틱)", "친구들과의 즐거운 모임 (소셜)", "혼자만의 휴식 시간 (릴랙스)"] },
+      { question: "어떤 향 계열에 마음이 끌리시나요?", type: 'multiple', options: ["다채로운 꽃의 향연(플로럴)", "달콤 생기 있는 과즙(프루티)", "상큼 청량한 시트러스", "차분한 숲과 나무(우디)", "따뜻하고 이국적인 느낌(스파이시·오리엔탈)", "포근한 비누·살결 느낌(머스크·파우더리)"] },
+      { question: "향수를 통해 표현하고 싶은 이미지는?", type: 'multiple', options: ["세련되고 도시적인", "따뜻하고 부드러운", "관능적이고 매혹적인", "지적이고 신뢰감 있는", "순수하고 깨끗한", "개성 있고 유니크한"] },
+      { question: "평소 즐겨 입는 패션 스타일은?", type: 'multiple', options: ["미니멀·클래식", "캐주얼·스포티", "모던·시크", "페미닌·로맨틱", "유니크·빈티지"] },
+      { question: "가장 좋아하는 하루의 시간대는 언제인가요?", type: 'single', options: ["이슬 맺힌 고요한 새벽", "햇살 쏟아지는 나른한 오후", "붉은 노을의 해질녘", "별이 빛나는 차분한 밤"] },
+      { question: "마음이 편안해지는 장소를 고르세요.", type: 'multiple', options: ["비 온 뒤의 촉촉한 숲속", "파도 소리가 들리는 한적한 해변", "오래된 책 냄새가 나는 서재", "향기로운 꽃이 가득한 정원", "갓 구운 빵 냄새가 나는 골목"] },
+      { question: "선호하는 원단의 감촉은 어떤가요?", type: 'single', options: ["부드럽게 감싸는 캐시미어", "시원하고 쾌적한 린넨", "매끄럽게 흐르는 실크", "깨끗하고 빳빳한 코튼"] },
+      { question: "촉감으로 비유하면 어떤 쪽이 더 끌리나요?", type: 'single', options: ["보송한 파우더", "맑고 투명한 물기", "부드럽고 크리미함", "건조한 나무결", "서늘한 유리감"] },
+      { question: "향의 존재감은 어느 정도가 좋나요?", type: 'single', options: ["내게만 은은하게", "대화 거리에서 느껴짐", "스치면 분명히 전해짐", "공간을 채우는 편"] },
+      { question: "원하는 잔향 길이는?", type: 'single', options: ["2–4시간", "6–8시간", "10시간 이상", "의류에도 오래 남아도 좋음"] },
+      { question: "향에 대한 민감도는?", type: 'single', options: ["쉽게 두통·피로를 느낌", "가끔 민감", "거의 괜찮음"] },
+      { question: "향수를 선택할 때 더 중요한 것은?", type: 'single', options: ["많은 사람이 좋아하는 '베스트셀러'", "나만 알고 싶은 '니치 향수'"] },
+      { question: "피하고 싶은 향의 느낌이 있다면?", type: 'single', options: ["너무 달아 울렁거리는 향", "인공적으로 머리 아픈 향", "톡 쏘듯 자극적인 향", "스모키·가죽 느낌의 향", "특별히 없음"] },
+      { question: "당신의 인생 향을 떠오르는 장면이나 단어로 자유롭게 적어주세요.", type: 'text', placeholder: "예: 비 갠 뒤 골목, 막 다린 셔츠, 차가운 유리창, 오후의 햇살" },
+      { question: "특별히 선호하는 향수 하우스가 있나요? (선택사항)", type: 'multiple_optional', options: ["샤넬 (CHANEL)", "디올 (DIOR)", "톰 포드 (TOM FORD)", "조 말론 (JO MALONE)", "크리드 (CREED)", "메종 마르지엘라 (MAISON MARGIELA)", "펜할리곤스 (PENHALIGON'S)", "르 라보 (LE LABO)", "바이레도 (BYREDO)", "랑방 (LANVIN)", "겔랑 (GUERLAIN)", "에르메스 (HERMÈS)", "프레데릭 말 (FRÉDÉRIC MALLE)", "라르티잔 파퓨뫼르 (L'ARTISAN PARFUMEUR)", "니시아네 (NISHANE)"], hasTextInput: true, textPlaceholder: "다른 선호 브랜드가 있다면 적어주세요" },
+      { question: "배제하고 싶은 향수 하우스가 있나요? (선택사항)", type: 'multiple_optional', options: ["샤넬 (CHANEL)", "디올 (DIOR)", "톰 포드 (TOM FORD)", "조 말론 (JO MALONE)", "크리드 (CREED)", "메종 마르지엘라 (MAISON MARGIELA)", "펜할리곤스 (PENHALIGON'S)", "르 라보 (LE LABO)", "바이레도 (BYREDO)", "랑방 (LANVIN)", "겔랑 (GUERLAIN)", "에르메스 (HERMÈS)", "프레데릭 말 (FRÉDÉRIC MALLE)", "라르티잔 파퓨뫼르 (L'ARTISAN PARFUMEUR)", "니시아네 (NISHANE)"], hasTextInput: true, textPlaceholder: "다른 배제하고 싶은 브랜드가 있다면 적어주세요" }
     ];
 
     const createQuizData = [
-      { question: '향수를 뿌렸을 때, 가장 먼저 어떤 느낌으로 시작하고 싶으신가요?', type: 'single', options: ['상쾌한 바람처럼', '톡 쏘는 과일처럼', '은은한 꽃잎처럼', '깨끗한 비누처럼'] },
-      { question: '당신의 마음을 가장 편안하게 해주는 장소는 어디인가요?', type: 'single', options: ['고요한 새벽의 숲', '햇살 가득한 과수원', '오래된 책들이 가득한 서재', '부드러운 모래사장의 해변'] },
-      { question: '향수가 시간이 지남에 따라 어떤 분위기를 자아냈으면 하나요?', type: 'single', options: ['따뜻하고 포근한', '우아하고 세련된', '신비롭고 매혹적인', '활기차고 긍정적인'] },
-      { question: '향기를 질감으로 표현한다면 어떤 느낌에 가까운가요?', type: 'single', options: ['부드러운 벨벳', '가볍고 투명한 쉬폰', '묵직하고 따뜻한 울', '바삭바삭한 마른 잎사귀'] },
-      { question: '향기에 달콤함을 더한다면, 어떤 종류의 달콤함이 좋을까요?', type: 'single', options: ['잘 익은 과일의 달콤함', '부드러운 바닐라 아이스크림', '향긋한 꿀 한 스푼', '달콤함은 별로 원하지 않아요'] },
-      { question: '당신의 향수에 약간의 스파이스를 더해 개성을 표현한다면?', type: 'single', options: ['따뜻한 시나몬', '톡 쏘는 생강', '이국적인 향신료', '스파이시함은 원하지 않아요'] },
-      { question: '마지막으로 피부에 남는 잔향은 어떤 느낌이었으면 좋겠나요?', type: 'single', options: ['차분하고 안정적인 나무 향', '부드럽고 관능적인 머스크 향', '흙과 이끼의 자연스러운 향', '깨끗하고 맑은 느낌'] },
-      { question: '이 향수가 가장 어울릴 것 같은 시간대는 언제인가요?', type: 'single', options: ['상쾌한 아침', '나른한 오후', '로맨틱한 저녁', '깊고 조용한 밤'] },
-      { question: '당신이 만들 향수를 색으로 표현한다면 어떤 색상 계열일까요?', type: 'single', options: ['따뜻한 베이지·브라운 계열', '부드러운 파스텔 톤', '깊고 짙은 버건디·네이비 계열', '맑고 투명한 느낌의 색'] },
-      { question: '당신의 향수에 붙여주고 싶은 이름이나, 떠오르는 단어가 있다면 자유롭게 적어주세요.', type: 'text', placeholder: '예: 새벽의 안개, 별의 속삭임, 나의 첫 여름...' }
+      { question: "향수를 뿌렸을 때, 가장 먼저 어떤 느낌으로 시작하고 싶으신가요?", type: "single", options: ["상쾌한 바람처럼", "톡 쏘는 과일처럼", "은은한 꽃잎처럼", "깨끗한 비누처럼"] },
+      { question: "당신의 마음을 가장 편안하게 해주는 장소는 어디인가요?", type: "single", options: ["고요한 새벽의 숲", "햇살 가득한 과수원", "오래된 책들이 가득한 서재", "부드러운 모래사장의 해변"] },
+      { question: "향수가 시간이 지남에 따라 어떤 분위기를 자아냈으면 하나요?", type: "single", options: ["따뜻하고 포근한", "우아하고 세련된", "신비롭고 매혹적인", "활기차고 긍정적인"] },
+      { question: "향기를 질감으로 표현한다면 어떤 느낌에 가까운가요?", type: "single", options: ["부드러운 벨벳", "가볍고 투명한 쉬폰", "묵직하고 따뜻한 울", "바삭바삭한 마른 잎사귀"] },
+      { question: "향기에 달콤함을 더한다면, 어떤 종류의 달콤함이 좋을까요?", type: "single", options: ["잘 익은 과일의 달콤함", "부드러운 바닐라 아이스크림", "향긋한 꿀 한 스푼", "달콤함은 별로 원하지 않아요"] },
+      { question: "당신의 향수에 약간의 스파이스를 더해 개성을 표현한다면?", type: "single", options: ["따뜻한 시나몬", "톡 쏘는 생강", "이국적인 향신료", "스파이시함은 원하지 않아요"] },
+      { question: "마지막으로 피부에 남는 잔향은 어떤 느낌이었으면 좋겠나요?", type: "single", options: ["차분하고 안정적인 나무 향", "부드럽고 관능적인 머스크 향", "흙과 이끼의 자연스러운 향", "깨끗하고 맑은 느낌"] },
+      { question: "이 향수가 가장 어울릴 것 같은 시간대는 언제인가요?", type: "single", options: ["상쾌한 아침", "나른한 오후", "로맨틱한 저녁", "깊고 조용한 밤"] },
+      { question: "당신이 만들 향수를 색으로 표현한다면 어떤 색상 계열일까요?", type: "single", options: ["따뜻한 베이지·브라운 계열", "부드러운 파스텔 톤", "깊고 짙은 버건디·네이비 계열", "맑고 투명한 느낌의 색"] },
+      { question: "당신의 향수에 붙여주고 싶은 이름이나, 떠오르는 단어가 있다면 자유롭게 적어주세요.", type: "text", placeholder: "예: 새벽의 안개, 별의 속삭임, 나의 첫 여름..." }
     ];
 
     // ----- State
@@ -452,55 +455,70 @@
 
     function startQuiz(mode) {
       currentMode = mode;
-      currentQuizData = mode === 'create' ? createQuizData : discoverQuizData;
+      currentQuizData = mode === "create" ? createQuizData : discoverQuizData;
       currentQuestionIndex = 0;
       userAnswers = [];
       selectedOptions.clear();
       isProcessing = false;
-      questionNumberEl.textContent = 1;
+
+      questionNumberEl.textContent = "1";
       questionTotalEl.textContent = currentQuizData.length;
-      questionTypeEl.textContent = '';
+      questionTypeEl.textContent = "";
       progressBarEl.style.width = `${(1 / currentQuizData.length) * 100}%`;
 
-      startScreen.classList.add('hidden');
-      quizScreen.classList.remove('hidden');
+      startScreen.classList.add("hidden");
+      quizScreen.classList.remove("hidden");
       displayQuestion();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function displayQuestion() {
       selectedOptions.clear();
       const question = currentQuizData[currentQuestionIndex];
       const isLast = currentQuestionIndex === currentQuizData.length - 1;
+
       questionNumberEl.textContent = currentQuestionIndex + 1;
       progressBarEl.style.width = `${((currentQuestionIndex + 1) / currentQuizData.length) * 100}%`;
       questionTitleEl.textContent = question.question;
-      optionsContainer.innerHTML = '';
-      nextButton.textContent = isLast ? '결과 보기' : '다음';
+      optionsContainer.innerHTML = "";
+      optionsContainer.classList.remove("md:grid-cols-2");
+      nextButton.textContent = isLast ? "결과 보기" : "다음";
 
-      if (question.type === 'text') {
-        questionTypeEl.textContent = '주관식 (자유 입력)';
-        document.getElementById('next-button-container').classList.remove('hidden');
-        optionsContainer.classList.remove('md:grid-cols-2');
-        const textArea = document.createElement('textarea');
-        textArea.id = 'text-answer';
-        textArea.className = 'w-full h-32 p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgba(201,169,106,0.45)] focus:border-[rgba(201,169,106,0.8)] transition';
-        textArea.placeholder = question.placeholder || '';
+      // 항상 버튼 컨테이너를 표시
+      document.getElementById("button-container").classList.remove("hidden");
+
+      // 이전 버튼 표시/숨김
+      const prevButton = document.getElementById("prev-button");
+      if (currentQuestionIndex > 0) {
+        prevButton.classList.remove("hidden");
+      } else {
+        prevButton.classList.add("hidden");
+      }
+
+      if (question.type === "text") {
+        questionTypeEl.textContent = "주관식 (자유 입력)";
+        optionsContainer.classList.remove("md:grid-cols-2");
+
+        const textArea = document.createElement("textarea");
+        textArea.id = "text-answer";
+        textArea.className = "w-full h-32 p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgba(201,169,106,0.45)] focus:border-[rgba(201,169,106,0.8)] transition";
+        textArea.placeholder = question.placeholder || "";
         optionsContainer.appendChild(textArea);
         nextButton.disabled = false;
       } else {
-        questionTypeEl.textContent = question.type === 'multiple' ? '복수 선택 가능' : '단일 선택';
-        document.getElementById('next-button-container').classList.toggle('hidden', question.type === 'single');
-        optionsContainer.classList.add('md:grid-cols-2');
+        questionTypeEl.textContent = question.type === "multiple" ? "복수 선택 가능" : "단일 선택";
+
+        optionsContainer.classList.add("md:grid-cols-2");
         question.options.forEach((optionText, index) => {
-          const card = document.createElement('div');
-          card.className = 'option-card text-left';
+          const card = document.createElement("div");
+          card.className = "option-card text-left";
           card.textContent = optionText;
-          card.dataset.optionIndex = index;
-          card.addEventListener('click', () => toggleOption(card, question.type));
+          card.dataset.optionIndex = String(index);
+          card.addEventListener("click", () => toggleOption(card, question.type));
           optionsContainer.appendChild(card);
         });
-        updateNextButtonState();
+
+        nextButton.disabled = true;
       }
     }
 
@@ -508,25 +526,21 @@
       if (isProcessing) return;
       const optionIndex = card.dataset.optionIndex;
 
-      if (type === 'single') {
-        isProcessing = true;
+      if (type === "single") {
         if (selectedOptions.has(optionIndex)) return;
-        const currentSelected = optionsContainer.querySelector('.selected');
-        if (currentSelected) currentSelected.classList.remove('selected');
-        card.classList.add('selected');
+        const currentSelected = optionsContainer.querySelector(".selected");
+        if (currentSelected) currentSelected.classList.remove("selected");
+        card.classList.add("selected");
         selectedOptions.clear();
         selectedOptions.add(optionIndex);
-        setTimeout(() => {
-          nextQuestion();
-          isProcessing = false;
-        }, 250);
+        nextButton.disabled = false;
       } else {
         if (selectedOptions.has(optionIndex)) {
           selectedOptions.delete(optionIndex);
-          card.classList.remove('selected');
+          card.classList.remove("selected");
         } else {
           selectedOptions.add(optionIndex);
-          card.classList.add('selected');
+          card.classList.add("selected");
         }
         updateNextButtonState();
       }
@@ -534,23 +548,19 @@
 
     function updateNextButtonState() {
       const question = currentQuizData[currentQuestionIndex];
-      if (question.type === 'multiple') {
+      if (question.type === "multiple") {
         nextButton.disabled = selectedOptions.size === 0;
-      } else {
-        nextButton.disabled = false;
       }
     }
 
     function collectCurrentAnswer(question) {
-      if (question.type === 'text') {
-        const textAnswer = (document.getElementById('text-answer')?.value || '').trim();
+      if (question.type === "text") {
+        const textAnswer = (document.getElementById("text-answer")?.value || "").trim();
         userAnswers.push({ question: question.question, answers: [textAnswer] });
       } else {
         const selectedTexts = Array.from(selectedOptions).map(index => question.options[parseInt(index, 10)]);
         if (selectedTexts.length > 0) {
           userAnswers.push({ question: question.question, answers: selectedTexts });
-        } else if (question.type === 'multiple') {
-          userAnswers.push({ question: question.question, answers: [] });
         }
       }
     }
@@ -558,76 +568,90 @@
     function nextQuestion() {
       const question = currentQuizData[currentQuestionIndex];
       collectCurrentAnswer(question);
-      currentQuestionIndex++;
+
+      currentQuestionIndex += 1;
       if (currentQuestionIndex < currentQuizData.length) {
         displayQuestion();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
         showLoadingAndAnalyze();
       }
     }
 
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        // 현재 답변 제거
+        if (userAnswers.length > 0) {
+          userAnswers.pop();
+        }
+        currentQuestionIndex -= 1;
+        displayQuestion();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+
     async function showLoadingAndAnalyze() {
-      quizScreen.classList.add('hidden');
-      loadingScreen.classList.remove('hidden');
-      loader.classList.remove('hidden');
-      retryContainer.classList.add('hidden');
-      loadingTitle.textContent = 'AI가 분석 중입니다.';
-      loadingMessage.innerHTML = currentMode === 'create'
-        ? '당신만의 향 조합을 분석해<br>새로운 조향 결과를 만드는 중...'
-        : '당신의 감성과 기억에서<br>가장 빛나는 향기를 찾는 중...';
+      quizScreen.classList.add("hidden");
+      loadingScreen.classList.remove("hidden");
+      loader.classList.remove("hidden");
+      retryContainer.classList.add("hidden");
+      loadingTitle.textContent = "AI가 분석 중입니다.";
+      loadingMessage.innerHTML = currentMode === "create"
+        ? "당신만의 향 조합을 분석해<br>새로운 조향 결과를 만드는 중..."
+        : "당신의 감성과 기억에서<br>가장 빛나는 향기를 찾는 중...";
+
       try {
         const result = await callGeminiAPI(userAnswers, currentMode);
         displayResults(result);
       } catch (error) {
-        console.error('AI analysis error:', error);
-        loader.classList.add('hidden');
-        loadingTitle.textContent = '오류 발생';
-        loadingMessage.innerHTML = '죄송합니다. 분석 중 오류가 발생했습니다.<br>다시 한 번 시도해주세요.';
-        retryContainer.classList.remove('hidden');
+        console.error("AI analysis error:", error);
+        loader.classList.add("hidden");
+        loadingTitle.textContent = "오류 발생";
+        loadingMessage.innerHTML = "죄송합니다. 분석 중 오류가 발생했습니다.<br>다시 한 번 시도해주세요.";
+        retryContainer.classList.remove("hidden");
       }
     }
 
     async function callGeminiAPI(answers, mode) {
-      const response = await fetch('/api/gemini', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ answers, mode })
       });
       if (!response.ok) {
-        const text = await response.text().catch(() => '');
+        const text = await response.text().catch(() => "");
         throw new Error(`API request failed: ${response.status} ${text}`);
       }
       return response.json();
     }
 
     function renderRecommendations(list) {
-      recommendationsContainer.innerHTML = '';
+      recommendationsContainer.innerHTML = "";
       (list || []).forEach((perfume, index) => {
-        const encodedName = encodeURIComponent((perfume.name || '').replace(/\s+/g, '+'));
+        const encodedName = encodeURIComponent((perfume.name || "").replace(/\s+/g, "+"));
         const keywords = Array.isArray(perfume.keywords) ? perfume.keywords : [];
         const card = `
           <div class="recommendation-card fade-in" style="animation-delay: ${index * 0.2}s;">
             <div class="flex items-start sm:items-center gap-4">
-              <img src="https://placehold.co/100x100/EFE6D8/53483F?text=${encodedName}" alt="${perfume.name || ''}" class="w-20 h-20 md:w-24 md:h-24 rounded-2xl object-cover flex-shrink-0" style="border: 1px solid rgba(83, 72, 63, 0.12); background-color: rgba(255, 255, 255, 0.75);">
+              <img src="https://placehold.co/100x100/EFE6D8/53483F?text=${encodedName}" alt="${perfume.name || ""}" class="w-20 h-20 md:w-24 md:h-24 rounded-2xl object-cover flex-shrink-0" style="border: 1px solid rgba(83, 72, 63, 0.12); background-color: rgba(255, 255, 255, 0.75);">
               <div class="flex-grow">
                 <div class="flex justify-between items-start gap-3">
                   <div>
-                    <p class="text-sm text-accent font-semibold">${perfume.brand || ''}</p>
-                    <h4 class="text-lg md:text-xl font-bold">${perfume.name || ''}</h4>
+                    <p class="text-sm text-accent font-semibold">${perfume.brand || ""}</p>
+                    <h4 class="text-lg md:text-xl font-bold">${perfume.name || ""}</h4>
                   </div>
                   <span class="tag">추천 ${index + 1}</span>
                 </div>
-                <p class="text-soft mt-2 mb-3 leading-relaxed">${perfume.description || ''}</p>
-                ${keywords.length ? `<div class="flex flex-wrap gap-2">${keywords.map(kw => `<span class="keyword-chip">${kw}</span>`).join('')}</div>` : ''}
+                <p class="text-soft mt-2 mb-3 leading-relaxed">${perfume.description || ""}</p>
+                ${keywords.length ? `<div class="flex flex-wrap gap-2">${keywords.map(kw => `<span class="keyword-chip">${kw}</span>`).join("")}</div>` : ""}
               </div>
             </div>
             <div class="mt-5 pt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" style="border-top: 1px solid rgba(83, 72, 63, 0.12);">
               <div>
                 <p class="subtle-text">예상 가격</p>
-                <p class="font-semibold price-text">${perfume.price || '가격 정보 없음'}</p>
+                <p class="font-semibold price-text">${perfume.price || "가격 정보 없음"}</p>
               </div>
-              <a href="${perfume.purchaseLink || '#'}" target="_blank" rel="noopener" class="btn-outline">구매 링크</a>
+              <a href="${perfume.purchaseLink || "#"}" target="_blank" rel="noopener" class="btn-outline">구매 링크</a>
             </div>
           </div>`;
         recommendationsContainer.innerHTML += card;
@@ -635,52 +659,54 @@
     }
 
     function renderNotes(notes) {
-      notesContainer.innerHTML = '';
-      if (!notes || typeof notes !== 'object') {
-        notesContainer.classList.add('hidden');\n        notesContainer.innerHTML = '';
+      notesContainer.innerHTML = "";
+      if (!notes || typeof notes !== "object") {
+        notesContainer.classList.add("hidden");
         return;
       }
+
       const noteOrder = [
-        { key: 'top', label: 'Top Notes' },
-        { key: 'middle', label: 'Middle Notes' },
-        { key: 'base', label: 'Base Notes' }
+        { key: "top", label: "Top Notes" },
+        { key: "middle", label: "Middle Notes" },
+        { key: "base", label: "Base Notes" }
       ];
+
       const fragments = noteOrder
         .map(({ key, label }) => {
           const value = notes[key];
-          if (!value) return '';
-          const display = Array.isArray(value) ? value.join(', ') : value;
-          if (!display) return '';
-          return `<div class="note-card"><h4>${label}</h4><p>${display}</p></div>`;
+          if (!value) return "";
+          const display = Array.isArray(value) ? value.join(", ") : value;
+          return display ? `<div class="note-card"><h4>${label}</h4><p>${display}</p></div>` : "";
         })
         .filter(Boolean);
+
       if (!fragments.length) {
-        notesContainer.classList.add('hidden');\n        notesContainer.innerHTML = '';
+        notesContainer.classList.add("hidden");
         return;
       }
-      notesContainer.innerHTML = fragments.join('
-');
-      notesContainer.classList.remove('hidden');
+
+      notesContainer.innerHTML = fragments.join("");
+      notesContainer.classList.remove("hidden");
     }
 
     function displayResults(result) {
-      loadingScreen.classList.add('hidden');
-      resultsScreen.classList.remove('hidden');
+      loadingScreen.classList.add("hidden");
+      resultsScreen.classList.remove("hidden");
 
-      if (currentMode === 'create') {
+      if (currentMode === "create") {
         const perfume = result?.perfume || {};
-        resultBadge.textContent = '나만의 향수 조향 결과';
-        resultTitle.textContent = perfume.name || '당신만의 향수';
-        resultDescription.textContent = perfume.description || '사용자 취향을 토대로 조향한 향수입니다.';
+        resultBadge.textContent = "나만의 향수 조향 결과";
+        resultTitle.textContent = perfume.name || "당신만의 향수";
+        resultDescription.textContent = perfume.description || "사용자 취향을 토대로 조향한 향수입니다.";
         renderNotes(perfume.notes);
         renderRecommendations(result?.recommendations || []);
       } else {
         const persona = result?.persona || {};
-        resultBadge.textContent = '당신만의 향기 페르소나';
-        resultTitle.textContent = persona.title || '향기 페르소나';
-        resultDescription.textContent = persona.description || '당신의 취향을 토대로 분석한 향기 페르소나입니다.';
-        notesContainer.classList.add('hidden');\n        notesContainer.innerHTML = '';
-        recommendationsContainer.innerHTML = '';
+        resultBadge.textContent = "당신만의 향기 페르소나";
+        resultTitle.textContent = persona.title || "향기 페르소나";
+        resultDescription.textContent = persona.description || "당신의 취향을 토대로 분석한 향기 페르소나입니다.";
+        notesContainer.classList.add("hidden");
+        notesContainer.innerHTML = "";
         renderRecommendations(result?.recommendations || []);
       }
     }
@@ -688,16 +714,18 @@
     function restartQuiz() {
       currentMode = null;
       currentQuizData = discoverQuizData;
-      startScreen.classList.remove('hidden');
-      quizScreen.classList.add('hidden');
-      loadingScreen.classList.add('hidden');
-      resultsScreen.classList.add('hidden');
-      startScreen.classList.add('fade-in');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      startScreen.classList.remove("hidden");
+      quizScreen.classList.add("hidden");
+      loadingScreen.classList.add("hidden");
+      resultsScreen.classList.add("hidden");
+      startScreen.classList.add("fade-in");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   </script>
 </body>
 </html>
+
+
 
 
 
