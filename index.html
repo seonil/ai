@@ -302,9 +302,9 @@
         </div>
         <h2 id="question-title" class="text-2xl md:text-3xl font-bold mb-6 leading-snug"></h2>
         <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        <div id="button-container" class="mt-8 flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <div id="button-container" class="mt-8 flex justify-between items-center gap-4">
           <button id="prev-button" class="btn-secondary hidden">이전</button>
-          <button id="next-button" class="btn-primary w-full sm:w-auto">다음</button>
+          <button id="next-button" class="btn-primary">다음</button>
         </div>
       </div>
     </section>
@@ -411,11 +411,16 @@
       optionsContainer.innerHTML = '';
       nextButton.textContent = isLast ? '결과 보기' : '다음';
 
-      // 이전 버튼 표시/숨김
+      // 이전 버튼 표시/숨김 및 레이아웃 조정
+      const buttonContainer = document.getElementById('button-container');
       if (isFirst) {
         prevButton.classList.add('hidden');
+        buttonContainer.classList.remove('justify-between');
+        buttonContainer.classList.add('justify-center');
       } else {
         prevButton.classList.remove('hidden');
+        buttonContainer.classList.remove('justify-center');
+        buttonContainer.classList.add('justify-between');
       }
 
       // 이전 답변이 있다면 복원
@@ -506,14 +511,12 @@
       if (isProcessing) return;
       const optionIndex = card.dataset.optionIndex;
       if (type === 'single') {
-        isProcessing = true;
         if (selectedOptions.has(optionIndex)) return;
         const currentSelected = optionsContainer.querySelector('.selected');
         if (currentSelected) currentSelected.classList.remove('selected');
         card.classList.add('selected');
         selectedOptions.clear();
         selectedOptions.add(optionIndex);
-        setTimeout(() => { nextQuestion(); isProcessing = false; }, 300);
       } else {
         if (selectedOptions.has(optionIndex)) {
           selectedOptions.delete(optionIndex);
@@ -528,7 +531,9 @@
 
     function updateNextButtonState() {
       const q = quizData[currentQuestionIndex];
-      if (q.type === 'multiple') {
+      if (q.type === 'single') {
+        nextButton.disabled = selectedOptions.size === 0;
+      } else if (q.type === 'multiple') {
         nextButton.disabled = selectedOptions.size === 0;
       } else if (q.type === 'multiple_optional') {
         nextButton.disabled = false; // 선택사항이므로 항상 활성화
