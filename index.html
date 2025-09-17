@@ -318,7 +318,7 @@
       <div class="card hero-card p-8 md:p-10 text-center max-w-xl mx-auto">
         <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4">Scent Finder</h1>
         <p class="text-lg text-muted mb-6 leading-relaxed">당신의 기억과 감성을 담아<br>인생 향수를 찾아드릴게요.</p>
-        <p class="text-soft mb-8">AI가 15가지 질문으로 취향을 분석하거나, 나만의 향수를 직접 조향해보세요.</p>
+        <p class="text-soft mb-8">또는 나만의 향수를 직접 조향해보세요.</p>
         <div class="flex flex-col md:flex-row items-center justify-center gap-3">
           <button id="discover-btn" class="btn-primary w-full md:w-auto">나의 인생 향수 찾기</button>
           <button id="create-btn" class="btn-secondary w-full md:w-auto">나만의 향수 만들기</button>
@@ -648,17 +648,49 @@
       }
     }
 
-    async function callGeminiAPI(answers, mode) {
-      const response = await fetch("/api/gemini", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers, mode })
-      });
-      if (!response.ok) {
-        const text = await response.text().catch(() => "");
-        throw new Error(`API request failed: ${response.status} ${text}`);
+    async function callGeminiAPI(answers, mode, retryCount = 0) {
+      const maxRetries = 3;
+
+      try {
+        const response = await fetch("/api/gemini", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ answers, mode })
+        });
+
+        if (!response.ok) {
+          const text = await response.text().catch(() => "");
+          throw new Error(`API request failed: ${response.status} ${text}`);
+        }
+
+        return response.json();
+      } catch (error) {
+        console.error(`API 호출 실패 (시도 ${retryCount + 1}/${maxRetries}):`, error);
+
+        if (retryCount < maxRetries - 1) {
+          // 재시도 전 잠시 대기 (1초씩 증가: 1초, 2초, 3초)
+          const delay = (retryCount + 1) * 1000;
+          console.log(`${delay/1000}초 후 재시도합니다...`);
+
+          // 로딩 메시지 업데이트
+          if (loadingMessage) {
+            loadingMessage.innerHTML = `연결 중 문제가 발생했습니다.<br>${delay/1000}초 후 자동으로 재시도합니다... (${retryCount + 2}/${maxRetries})`;
+          }
+
+          await new Promise(resolve => setTimeout(resolve, delay));
+
+          // 로딩 메시지 원래대로 복구
+          if (loadingMessage) {
+            loadingMessage.innerHTML = currentMode === "create"
+              ? "당신만의 향 조합을 분석해<br>새로운 조향 결과를 만드는 중..."
+              : "당신의 감성과 기억에서<br>가장 빛나는 향기를 찾는 중...";
+          }
+
+          return callGeminiAPI(answers, mode, retryCount + 1);
+        } else {
+          throw error;
+        }
       }
-      return response.json();
     }
 
     function renderRecommendations(list) {
