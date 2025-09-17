@@ -11,77 +11,320 @@
 
   <!-- PWA basics -->
   <link rel="manifest" href="/manifest.webmanifest">
-  <meta name="theme-color" content="#4f46e5">
+  <meta name="theme-color" content="#c9a96a">
   <link rel="icon" href="/icon-192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="/icon-192.png">
 
-  <style>
-    body { font-family: 'Noto Sans KR', sans-serif; }
-    .font-serif { font-family: 'Playfair Display', serif; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .fade-in { animation: fadeIn 0.8s ease-out forwards; }
-    .option-card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out; }
-    .option-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
-    .option-card.selected { border-color: #4f46e5; background-color: #eef2ff; transform: translateY(-2px); }
-    .loader { border: 4px solid #f3f3f3; border-top: 4px solid #4f46e5; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    <style>
+    :root {
+      --cream: #f7f2e9;
+      --linen: #efe6d8;
+      --gold: #c9a96a;
+      --deep-brown: #53483f;
+      --sage: #8b9582;
+      --lavender: #a398c5;
+      --soft-shadow: 0 18px 35px rgba(83, 72, 63, 0.12);
+    }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: var(--cream);
+      color: var(--deep-brown);
+    }
+
+    .font-serif {
+      font-family: 'Playfair Display', serif;
+      color: var(--deep-brown);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    .hero-section,
+    .quiz-section {
+      position: relative;
+      border-radius: 28px;
+      padding: clamp(1.5rem, 4vw, 3rem);
+      background: linear-gradient(140deg, rgba(239, 230, 216, 0.7), rgba(247, 242, 233, 0.95));
+      overflow: hidden;
+    }
+
+    .hero-section::before,
+    .quiz-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+    }
+
+    .hero-section .card,
+    .quiz-section .card {
+      position: relative;
+    }
+
+    .card {
+      position: relative;
+      background: rgba(255, 255, 255, 0.88);
+      border-radius: 24px;
+      border: 1px solid rgba(83, 72, 63, 0.12);
+      box-shadow: var(--soft-shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    .hero-card {
+      background: none;
+      background-image: url('./assets/perfume-hero.png');
+      background-size: cover;
+      background-position: center right;
+      background-repeat: no-repeat;
+      color: var(--deep-brown);
+    }
+
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, rgba(255, 255, 255, 0.92) 0%, rgba(247, 242, 233, 0.85) 40%, rgba(247, 242, 233, 0.5) 100%);
+      
+    }
+
+    .hero-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .badge-gold {
+      display: inline-block;
+      padding: 0.35rem 1.1rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 9999px;
+      background: rgba(201, 169, 106, 0.18);
+      color: var(--deep-brown);
+      font-weight: 600;
+    }
+
+    .text-accent {
+      color: var(--gold);
+    }
+
+    .text-muted {
+      color: rgba(83, 72, 63, 0.72);
+    }
+
+    .text-soft {
+      color: rgba(83, 72, 63, 0.56);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 2.5rem;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, var(--gold), #d9b784);
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      box-shadow: 0 10px 24px rgba(201, 169, 106, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 32px rgba(201, 169, 106, 0.38);
+    }
+
+    .btn-primary:disabled {
+      background: linear-gradient(135deg, #e0c99b, #d6c19d);
+      opacity: 0.65;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 2.25rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(83, 72, 63, 0.18);
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--deep-brown);
+      font-weight: 600;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: var(--soft-shadow);
+    }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.65rem 1.75rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(201, 169, 106, 0.6);
+      background: rgba(247, 242, 233, 0.65);
+      color: var(--deep-brown);
+      font-weight: 600;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+
+    .btn-outline:hover {
+      transform: translateY(-1px);
+      background: rgba(201, 169, 106, 0.16);
+      box-shadow: var(--soft-shadow);
+    }
+
+    .option-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(83, 72, 63, 0.1);
+      border-radius: 18px;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .option-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--soft-shadow);
+      border-color: rgba(201, 169, 106, 0.55);
+    }
+
+    .option-card.selected {
+      border-color: var(--gold);
+      background-color: rgba(249, 240, 223, 0.95);
+      box-shadow: 0 12px 28px rgba(201, 169, 106, 0.28);
+      color: var(--deep-brown);
+    }
+
+    .progress-track {
+      background-color: rgba(83, 72, 63, 0.12);
+    }
+
+    .progress-bar {
+      background: linear-gradient(135deg, var(--gold), #d9b784);
+    }
+
+    .loader {
+      border: 4px solid rgba(255, 255, 255, 0.6);
+      border-top: 4px solid var(--gold);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .recommendation-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(83, 72, 63, 0.12);
+      border-radius: 22px;
+      padding: 1.5rem;
+      box-shadow: var(--soft-shadow);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      background: rgba(201, 169, 106, 0.18);
+      color: var(--deep-brown);
+    }
+
+    .keyword-chip {
+      padding: 0.35rem 0.7rem;
+      font-size: 0.75rem;
+      border-radius: 12px;
+      background: rgba(139, 149, 130, 0.16);
+      color: var(--deep-brown);
+      font-weight: 500;
+    }
+
+    .price-text {
+      color: var(--deep-brown);
+    }
+
+    .subtle-text {
+      color: rgba(83, 72, 63, 0.6);
+      font-size: 0.8rem;
+    }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body>
   <div id="app" class="max-w-2xl mx-auto p-4 md:p-8">
     <!-- Start Screen -->
-    <section id="start-screen" class="text-center fade-in">
-      <div class="bg-white p-8 rounded-2xl shadow-lg">
-        <h1 class="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-4">Scent Finder</h1>
-        <p class="text-lg text-gray-600 mb-6">당신의 기억과 감성을 담아<br>인생 향수를 찾아드릴게요.</p>
-        <p class="text-gray-500 mb-8">AI가 15가지 질문으로 당신의 취향을 분석해드려요.</p>
-        <button id="start-btn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-full hover:bg-indigo-700 transition-colors shadow-md text-lg">맞춤 향수 찾기 시작</button>
+    <section id="start-screen" class="text-center fade-in hero-section">
+      <div class="card hero-card p-8 md:p-10 text-center max-w-xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4">Scent Finder</h1>
+        <p class="text-lg text-muted mb-6 leading-relaxed">당신의 기억과 감성을 담아<br>인생 향수를 찾아드릴게요.</p>
+        <p class="text-soft mb-8">AI가 15가지 질문으로 당신의 취향을 분석해드려요.</p>
+        <button id="start-btn" class="btn-primary">맞춤 향수 찾기 시작</button>
       </div>
     </section>
 
     <!-- Quiz Screen -->
-    <section id="quiz-screen" class="hidden">
-      <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+    <section id="quiz-screen" class="hidden quiz-section">
+      <div class="card p-6 md:p-8">
         <div class="mb-6">
           <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-medium text-indigo-600">Question <span id="question-number"></span>/15</span>
-            <span id="question-type" class="text-xs text-gray-500"></span>
+            <span class="text-sm font-semibold text-accent tracking-wide uppercase">Question <span id="question-number"></span>/15</span>
+            <span id="question-type" class="text-xs text-soft tracking-wide uppercase"></span>
           </div>
-          <div class="w-full bg-gray-200 rounded-full h-2.5">
-            <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300"></div>
+          <div class="progress-track w-full rounded-full h-2.5">
+            <div id="progress-bar" class="progress-bar h-2.5 rounded-full transition-all duration-300"></div>
           </div>
         </div>
-        <h2 id="question-title" class="text-2xl font-bold mb-6 text-gray-900 leading-snug"></h2>
+        <h2 id="question-title" class="text-2xl md:text-3xl font-bold mb-6 leading-snug"></h2>
         <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         <div id="next-button-container" class="mt-8 text-center">
-          <button id="next-button" class="bg-indigo-600 text-white font-bold py-3 px-12 rounded-full hover:bg-indigo-700 transition-colors shadow-md disabled:bg-gray-300">다음</button>
+          <button id="next-button" class="btn-primary w-full md:w-auto">다음</button>
         </div>
       </div>
     </section>
 
     <!-- Loading Screen -->
     <section id="loading-screen" class="hidden text-center fade-in">
-      <div class="bg-white p-8 rounded-2xl shadow-lg flex flex-col items-center justify-center min-h-[400px]">
+      <div class="card p-8 flex flex-col items-center justify-center min-h-[400px]">
         <div id="loader" class="loader mb-6"></div>
-        <h2 id="loading-title" class="text-2xl font-bold text-gray-900 mb-2">Gemini AI가 분석 중입니다.</h2>
-        <p id="loading-message" class="text-gray-600">당신의 감성과 기억에서<br>가장 빛나는 향기를 찾는 중...</p>
+        <h2 id="loading-title" class="text-2xl font-bold mb-2">AI가 분석 중입니다.</h2>
+        <p id="loading-message" class="text-soft leading-relaxed">당신의 감성과 기억에서<br>가장 빛나는 향기를 찾는 중...</p>
         <div id="retry-container" class="hidden mt-6">
-          <button id="retry-btn" class="bg-red-600 text-white font-bold py-3 px-8 rounded-full hover:bg-red-700 transition-colors">다시 요청</button>
+          <button id="retry-btn" class="btn-outline">다시 요청</button>
         </div>
       </div>
     </section>
 
     <!-- Results Screen -->
     <section id="results-screen" class="hidden fade-in">
-      <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+      <div class="card p-6 md:p-8">
         <div class="text-center mb-6">
-          <p class="text-sm text-indigo-600 font-semibold">당신만의 향기 페르소나</p>
-          <h3 id="persona-title" class="text-2xl md:text-3xl font-bold text-gray-900"></h3>
-          <p id="persona-description" class="text-gray-600 mt-2"></p>
+          <p class="badge-gold">당신만의 향기 페르소나</p>
+          <h3 id="persona-title" class="text-2xl md:text-3xl font-bold"></h3>
+          <p id="persona-description" class="text-soft mt-2 leading-relaxed"></p>
         </div>
         <div id="recommendations-container" class="space-y-4"></div>
         <div class="mt-8 text-center">
-          <button id="restart-btn" class="bg-gray-800 text-white font-bold py-3 px-8 rounded-full hover:bg-gray-900 transition-colors">다시 찾기</button>
+          <button id="restart-btn" class="btn-secondary">다시 찾기</button>
         </div>
       </div>
     </section>
@@ -127,7 +370,7 @@
       { question: "향에 대한 민감도는?", type: 'single', options: ["쉽게 두통·피로를 느낌", "가끔 민감", "거의 괜찮음"] },
       { question: "향수를 선택할 때 더 중요한 것은?", type: 'single', options: ["많은 사람이 좋아하는 '베스트셀러'", "나만 알고 싶은 '니치 향수'"] },
       { question: "피하고 싶은 향의 느낌이 있다면?", type: 'single', options: ["너무 달아 울렁거림", "인공적으로 머리 아픔", "톡 쏘듯 자극적임", "스모키·가죽 느낌", "특별히 없음"] },
-      { question: "기피하는 향 노트를 모두 고르세요.", type: 'multiple', options: ["지나치게 달달한 디저트 느낌", "분말가루 같은 파우더감", "축축한 흙·이끼 느낌", "가죽·훈연·타는 나무 느낌", "시나몬·정향 같은 강한 향신 느낌", "과일 캔디처럼 인공 과즙 향", "특별히 없음"] },
+      { question: "기피하는 향 노트를 모두 고르세요.", type: 'multiple', options: ["지나치게 달달한 디저트 느낌", "진한 흰꽃의 화사함", "분말가루 같은 파우더감", "축축한 흙·이끼 느낌", "가죽·훈연·타는 나무 느낌", "바닷물·세제 같은 느낌", "시나몬·정향 같은 강한 향신 느낌", "약품·멘톨 같은 의약품 느낌", "과일 캔디처럼 인공 과즙 느낌", "레몬 세제 같은 청소세제 느낌", "특별히 없음"] },
       { question: "당신의 인생 향을 떠오르는 장면이나 단어로 자유롭게 적어주세요.", type: 'text', placeholder: "예: 비 갠 뒤 골목, 막 다린 셔츠, 차가운 유리창, 오후의 햇살" }
     ];
 
@@ -161,7 +404,7 @@
         document.getElementById('next-button-container').classList.remove('hidden');
         const textArea = document.createElement('textarea');
         textArea.id = 'text-answer';
-        textArea.className = 'w-full h-32 p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition';
+        textArea.className = 'w-full h-32 p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgba(201,169,106,0.45)] focus:border-[rgba(201,169,106,0.8)] transition';
         textArea.placeholder = question.placeholder;
         optionsContainer.appendChild(textArea);
         optionsContainer.classList.remove('md:grid-cols-2');
@@ -172,7 +415,7 @@
         optionsContainer.classList.add('md:grid-cols-2');
         question.options.forEach((optionText, index) => {
           const card = document.createElement('div');
-          card.className = 'option-card border-2 border-gray-200 p-4 rounded-xl cursor-pointer text-center';
+          card.className = 'option-card text-left';
           card.textContent = optionText;
           card.dataset.optionIndex = index;
           card.onclick = () => toggleOption(card, question.type);
@@ -275,29 +518,29 @@
       (result.recommendations || []).forEach((perfume, index) => {
         const encodedName = encodeURIComponent((perfume.name || '').replace(/ /g, '+'));
         const card = `
-          <div class="bg-gray-50 p-4 rounded-xl text-left fade-in" style="animation-delay: ${index * 0.2}s;">
-            <div class="flex items-start sm:items-center space-x-4">
-              <img src="https://placehold.co/100x100/F3F4F6/333333?text=${encodedName}" alt="${perfume.name}" class="w-20 h-20 md:w-24 md:h-24 rounded-lg object-cover flex-shrink-0">
+          <div class="recommendation-card fade-in" style="animation-delay: ${index * 0.2}s;">
+            <div class="flex items-start sm:items-center gap-4">
+              <img src="https://placehold.co/100x100/EFE6D8/53483F?text=${encodedName}" alt="${perfume.name}" class="w-20 h-20 md:w-24 md:h-24 rounded-2xl object-cover flex-shrink-0" style="border: 1px solid rgba(83, 72, 63, 0.12); background-color: rgba(255, 255, 255, 0.75);">
               <div class="flex-grow">
-                <div class="flex justify-between items-start">
+                <div class="flex justify-between items-start gap-3">
                   <div>
-                    <p class="text-sm text-indigo-600 font-semibold">${perfume.brand || ""}</p>
-                    <h4 class="text-lg md:text-xl font-bold text-gray-900">${perfume.name || ''}</h4>
+                    <p class="text-sm text-accent font-semibold">${perfume.brand || ""}</p>
+                    <h4 class="text-lg md:text-xl font-bold">${perfume.name || ''}</h4>
                   </div>
-                  <span class="text-xs font-bold bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full whitespace-nowrap ml-2">추천 ${index + 1}</span>
+                  <span class="tag">추천 ${index + 1}</span>
                 </div>
-                <p class="text-sm text-gray-600 mt-1 mb-2">${perfume.description || ''}</p>
+                <p class="text-soft mt-2 mb-3 leading-relaxed">${perfume.description || ''}</p>
                 <div class="flex flex-wrap gap-2">
-                  ${(perfume.keywords || []).map(kw => `<span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-md">${kw}</span>`).join('')}
+                  ${(perfume.keywords || []).map(kw => `<span class="keyword-chip">${kw}</span>`).join('')}
                 </div>
               </div>
             </div>
-            <div class="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
+            <div class="mt-5 pt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" style="border-top: 1px solid rgba(83, 72, 63, 0.12);">
               <div>
-                <p class="text-xs text-gray-500">예상 가격</p>
-                <p class="font-bold text-gray-800">${perfume.price || '가격 정보 없음'}</p>
+                <p class="subtle-text">예상 가격</p>
+                <p class="font-semibold price-text">${perfume.price || '가격 정보 없음'}</p>
               </div>
-              <a href="${perfume.purchaseLink || '#'}" target="_blank" rel="noopener" class="bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-full hover:bg-indigo-600 transition-colors">구매 링크</a>
+              <a href="${perfume.purchaseLink || '#'}" target="_blank" rel="noopener" class="btn-outline">구매 링크</a>
             </div>
           </div>`;
         recommendationsContainer.innerHTML += card;
