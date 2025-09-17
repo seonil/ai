@@ -8,6 +8,8 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/manifest.webmanifest", "dest": "/public/manifest.webmanifest" },
+    { "src": "/assets/(.*)", "dest": "/public/assets/$1" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
+
 }
