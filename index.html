@@ -340,9 +340,13 @@
         </div>
         <h2 id="question-title" class="text-2xl md:text-3xl font-bold mb-6 leading-snug"></h2>
         <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-        <div id="button-container" class="mt-6 flex justify-between items-center gap-4">
+        <div id="button-container" class="mt-6 flex items-center gap-4">
           <button id="prev-button" class="btn-secondary hidden">이전</button>
+          <div class="flex-grow"></div>
           <button id="next-button" class="btn-primary">다음</button>
+        </div>
+        <div class="mt-6 text-center">
+          <button id="quiz-restart-btn" class="btn-outline text-sm">처음으로 돌아가기</button>
         </div>
       </div>
     </section>
@@ -355,6 +359,9 @@
         <p id="loading-message" class="text-soft leading-relaxed">당신의 감성과 기억에서<br>가장 빛나는 향기를 찾는 중...</p>
         <div id="retry-container" class="hidden mt-6">
           <button id="retry-btn" class="btn-outline">다시 요청</button>
+        </div>
+        <div class="mt-6">
+          <button id="loading-restart-btn" class="btn-outline text-sm">처음으로 돌아가기</button>
         </div>
       </div>
     </section>
@@ -410,6 +417,8 @@
     document.getElementById("prev-button").addEventListener("click", prevQuestion);
     retryBtn.addEventListener("click", showLoadingAndAnalyze);
     restartBtn.addEventListener("click", restartQuiz);
+    document.getElementById("quiz-restart-btn").addEventListener("click", restartQuiz);
+    document.getElementById("loading-restart-btn").addEventListener("click", restartQuiz);
 
     // ----- Quiz Data
     const discoverQuizData = [
